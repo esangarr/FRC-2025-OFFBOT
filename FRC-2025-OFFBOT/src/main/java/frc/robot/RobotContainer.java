@@ -6,17 +6,22 @@ package frc.robot;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.DriveCommands.DriveCommands;
 import frc.robot.DriveTrain.Swerve;
 import frc.robot.DriveTrain.Swerve.SwervePathConstraints;
+import frc.robot.DriveTrain.Vision;
 import lib.ForgePlus.NetworkTableUtils.NTPublisher;
 import lib.ForgePlus.NetworkTableUtils.NTSendableChooser;
 
 public class RobotContainer {
 
   private final Swerve chassis;
+  private final Vision vision;
 
   private final CommandXboxController driver = new CommandXboxController(0);
 
@@ -27,10 +32,14 @@ public class RobotContainer {
 
   public NTSendableChooser<Command> autoChooser = new NTSendableChooser<>(NTPublisher.ROBOT, "AutoSelector");
 
+
   public RobotContainer() {
 
     chassis = new Swerve(SwervePathConstraints.kNormal);
-
+    vision = new Vision("Arducam1",     
+                        new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0, 0, 0)),//Poner posicion de la camara respecto al robot  
+                        chassis::addVisionMeasurement);
+                          
     NTPublisher.publish("Joysticks", "Driver1", driver);
   
     lateral = new PathPlannerAuto("lat");

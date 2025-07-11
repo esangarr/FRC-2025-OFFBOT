@@ -9,6 +9,7 @@ import com.pathplanner.lib.path.PathConstraints;
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -18,6 +19,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -50,8 +53,6 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
       };
     
     private Rotation2d rawGyroRotation = new Rotation2d();
-
-    private final SwerveDrivePoseEstimator estimator = new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
     
     private final PIDConstants translationPPgains; 
     private final PIDConstants rotationPPgains;
@@ -60,12 +61,13 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
 
     private SwerveModule[] modules = new SwerveModule[4];
 
+    private final SwerveDrivePoseEstimator estimator = new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
+
     public PathConstraints selectedConstraints;
 
     public ElasticField dashboardField;
 
-    public OculusPlus nav = new OculusPlus();
-    
+    public OculusPlus nav = new OculusPlus();   
 
     public enum SwervePathConstraints{
         kFast, kNormal
@@ -255,14 +257,20 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
 
     }
 
-    
+
+    public void addVisionMeasurement(Pose2d visionMeasurement, double timestampSeconds) {
+        estimator.addVisionMeasurement(visionMeasurement, timestampSeconds);
+    }
+
+    public void addVisionMeasurement(
+        Pose2d visionMeasurement, double timestampSeconds, Matrix<N3, N1> stdDevs) {
+        estimator.addVisionMeasurement(visionMeasurement, timestampSeconds, stdDevs);
+    }
+
 
     @Override
     public void RealDevicesPeriodic(){
     }
-
-    
-
 
     @Override
     public void SimulationDevicesPeriodic(){}
