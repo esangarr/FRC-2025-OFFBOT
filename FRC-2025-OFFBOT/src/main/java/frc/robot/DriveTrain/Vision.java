@@ -141,6 +141,7 @@ public class Vision extends NetworkSubsystem{
         return getBestTarget().getSkew();
     }
 
+    // Returns the 2D transform from the camera to the target in the camera's coordinate frame.
     public Transform2d getCameraToTarget2D() {
         PhotonTrackedTarget target = getBestTarget();
         if (target == null) return null;
