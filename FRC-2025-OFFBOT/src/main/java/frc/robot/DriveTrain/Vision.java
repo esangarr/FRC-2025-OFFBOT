@@ -20,11 +20,9 @@ import frc.robot.Robot;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.VecBuilder;
-
 
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.NetworkSubsystem;
@@ -110,6 +108,7 @@ public class Vision extends NetworkSubsystem{
         }
     }
 
+    @AutoNetworkPublisher(key= "Data/HasTarget")
     public boolean hasTarget(){
         var result = camera.getLatestResult();
 
@@ -122,22 +121,27 @@ public class Vision extends NetworkSubsystem{
         return result.getBestTarget();
     }
 
+    @AutoNetworkPublisher(key= "Data/Yaw")
     public double getYaw(){
         return getBestTarget().getYaw();
     }
 
+    @AutoNetworkPublisher(key= "Data/Pitch")
     public double getPitch(){
         return getBestTarget().getPitch();
     }
 
+    @AutoNetworkPublisher(key= "Data/Area")
     public double getArea(){
         return getBestTarget().getArea();
     }
 
+    @AutoNetworkPublisher(key= "Data/Skew")
     public double getSkew(){
         return getBestTarget().getSkew();
     }
 
+    // Returns the 2D transform from the camera to the target in the camera's coordinate frame.
     public Transform2d getCameraToTarget2D() {
         PhotonTrackedTarget target = getBestTarget();
         if (target == null) return null;
