@@ -6,6 +6,7 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.PhotonUtils;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
@@ -16,17 +17,11 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import frc.robot.Robot;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.VecBuilder;
-
-
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.NetworkSubsystem;
 import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.Annotations.AutoNetworkPublisher;
 
@@ -42,41 +37,18 @@ public class Vision extends NetworkSubsystem{
     public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);// Valores falsos (hay que sacarlos nosotros)
     public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);// Valores falsos (hay que sacarlos nosotros)
 
-    private VisionSystemSim visionSim;
-    private PhotonCameraSim cameraSim;
-
+    private boolean target = false;
 
     public Vision(String cameraName , Transform3d kRobotToCam, EstimateConsumer estConsumer) {
         
-        super("PhotonVision/Data", false);
+        super("photonForge/Data", false);
+
 
         this.camera = new PhotonCamera(cameraName);
         this.photonEstimator = new PhotonPoseEstimator(kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, kRobotToCam);
         this.estConsumer = estConsumer;
 
         photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
-
-        if (Robot.isSimulation()) {
-            // Create the vision system simulation which handles cameras and targets on the field.
-            visionSim = new VisionSystemSim("main");
-            // Add all the AprilTags inside the tag layout as visible targets to this simulated field.
-            visionSim.addAprilTags(kTagLayout);
-            // Create simulated camera properties. These can be set to mimic your actual camera.
-            var cameraProp = new SimCameraProperties();
-            cameraProp.setCalibration(960, 720, Rotation2d.fromDegrees(90));
-            cameraProp.setCalibError(0.35, 0.10);
-            cameraProp.setFPS(15);
-            cameraProp.setAvgLatencyMs(50);
-            cameraProp.setLatencyStdDevMs(15);
-            // Create a PhotonCameraSim which will update the linked PhotonCamera's values with visible
-            // targets.
-            cameraSim = new PhotonCameraSim(camera, cameraProp);
-            // Add the simulated camera to view the targets on this simulated field.
-            visionSim.addCamera(cameraSim, kRobotToCam);
-
-            cameraSim.enableDrawWireframe(true);
-        }
-
         
     }
 
@@ -89,31 +61,25 @@ public class Vision extends NetworkSubsystem{
             visionEst = photonEstimator.update(change);
             updateEstimationStdDevs(visionEst, change.getTargets());
 
-            if (Robot.isSimulation()) {
-                visionEst.ifPresentOrElse(
-                        est ->
-                                getSimDebugField()
-                                        .getObject("VisionEstimation")
-                                        .setPose(est.estimatedPose.toPose2d()),
-                        () -> {
-                            getSimDebugField().getObject("VisionEstimation").setPoses();
-                        });
-            }
+            target = !visionEst.isEmpty();
 
             visionEst.ifPresent(
                     est -> {
                         // Change our trust in the measurement based on the tags we can see
                         var estStdDevs = getEstimationStdDevs();
 
+                        publishOutput("Pose", est.estimatedPose.toPose2d());
+
                         estConsumer.accept(est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
                     });
         }
+
+        
     }
 
+    @AutoNetworkPublisher(key = "Target")
     public boolean hasTarget(){
-        var result = camera.getLatestResult();
-
-        return result.hasTargets();
+        return target;
     }
 
     public PhotonTrackedTarget getBestTarget(){
@@ -150,6 +116,7 @@ public class Vision extends NetworkSubsystem{
         return camToTarget2d;
     }
 
+    
     public Transform3d getCameraToTarget3D(){
         return getBestTarget().getBestCameraToTarget();
     }
@@ -171,16 +138,6 @@ public class Vision extends NetworkSubsystem{
 
         return result.getTargets();
     }
-
-    public Field2d getSimDebugField() {
-        if (!Robot.isSimulation()) return null;
-        return visionSim.getDebugField();
-    }
-
-    public void resetSimPose(Pose2d pose) {
-        if (Robot.isSimulation()) visionSim.resetRobotPose(pose);
-    }
-    
 
     @FunctionalInterface
     public static interface EstimateConsumer {

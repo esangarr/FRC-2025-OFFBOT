@@ -36,8 +36,8 @@ public class RobotContainer {
   public RobotContainer() {
 
     chassis = new Swerve(SwervePathConstraints.kNormal);
-    vision = new Vision("Arducam1",     
-                        new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0, 0, 0)),//Poner posicion de la camara respecto al robot  
+    vision = new Vision("Arducam_1",     
+                        new Transform3d(new Translation3d(0-.2583434, -0.3018282, 0.206375), new Rotation3d(0.491, 0, 0.869)),//Poner posicion de la camara respecto al robot  
                         chassis::addVisionMeasurement);
                           
     NTPublisher.publish("Joysticks", "Driver1", driver);
@@ -61,9 +61,6 @@ public class RobotContainer {
     
     chassis.setDefaultCommand(DriveCommands.joystickDrive(chassis, ()-> -driver.getLeftY(), ()-> -driver.getLeftX(), ()-> -driver.getRightX()));
 
-    
-    //driver.x().whileTrue(chassis.getPathFinder().toPoseCommand(new Pose2d(0.53, 3.6, Rotation2d.kZero)));
-    
   }
 
   public Command getAutonomousCommand() {
