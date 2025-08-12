@@ -118,7 +118,7 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
         this::runVelocity,
       new PPHolonomicDriveController(
         new PIDConstants(5.5, 0.0,0),
-         new PIDConstants(2.81, 0.0, 0.001)),
+         new PIDConstants(6.4, 0.0, 0.001)),
       getPathPlannerConfiguration(),
       () -> DriverStation.getAlliance().
         orElse(Alliance.Blue) == Alliance.Red,

@@ -15,9 +15,9 @@ import lib.ForgePlus.Math.Profiles.Control.PIDControl;
 import lib.ForgePlus.Math.Profiles.ProfileGains.PIDGains;
 import lib.ForgePlus.Math.Profiles.ProfileGains.SimpleFeedForwardGains;
 import lib.ForgePlus.REV.SparkMax.ForgeSparkMax;
-import lib.ForgePlus.Sim.SimulatedSubsystem;
 import lib.ForgePlus.Sim.Annotations.RealDevice;
 import lib.ForgePlus.Sim.Annotations.SimulatedDevice;
+import lib.ForgePlus.Sim.SimulatedSubsystem;
 
 public class SwerveModule implements SimulatedSubsystem{
 
@@ -172,7 +172,7 @@ public class SwerveModule implements SimulatedSubsystem{
     }
 
     public double getModuleVelocity(){
-        return driveVelocity * WHEELRADIUS;
+        return driveVelocity;
     }
 
     public double getFFCharacterizationVelocity() {
