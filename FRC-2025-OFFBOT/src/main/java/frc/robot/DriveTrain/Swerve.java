@@ -42,7 +42,7 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
     @RealDevice
     private final AHRS navX;
 
-    private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleLocations());
+    private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleLocations());
 
     private SwerveModulePosition[] lastModulePositions =
       new SwerveModulePosition[] {
