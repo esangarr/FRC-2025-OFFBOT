@@ -31,7 +31,7 @@ public class OculusPlus extends NetworkSubsystem{
 
     public final StandardDeviations dev = new StandardDeviations(0.02, 0.02, 0.035);
 
-    private static final Transform2d robotToQuest = new Transform2d(-0.3684, 0.0465, Rotation2d.k180deg);
+    public final static Transform2d robotToQuest = new Transform2d(-0.3684, 0.0465, Rotation2d.k180deg);
 
     private final NetworkTableInstance nt4Instance = NetworkTableInstance.getDefault();
 

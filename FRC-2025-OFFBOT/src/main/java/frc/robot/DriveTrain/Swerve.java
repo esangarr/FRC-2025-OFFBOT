@@ -243,10 +243,24 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
             Twist2d twist = kinematics.toTwist2d(moduleDeltas);
             rawGyroRotation = rawGyroRotation.plus(new Rotation2d(twist.dtheta));
         }
+
         nav.update();
+
+        if (nav.isTracking()){
+            PoseFrame[] questFrames = nav.getAllUnreadPoseFrames();
+
+            for (PoseFrame questFrame : questFrames) {
+                // Get the pose of the Quest
+                Pose2d questPose = questFrame.questPose();
+                // Get timestamp for when the data was sent
+                double timestamp = questFrame.dataTimestamp();
         
-        if (nav.hasPose()) {
-            estimator.addVisionMeasurement(nav.getPose(), nav.getAppTimestamp().getAsDouble() , nav.dev.asVector());
+                // Transform by the mount pose to get your robot pose
+                Pose2d robotPose = questPose.transformBy(OculusPlus.robotToQuest.inverse());
+        
+                // Add the measurement to our estimator
+                estimator.addVisionMeasurement(robotPose, timestamp, nav.dev.asVector());
+            }
         }
         
         estimator.update(rawGyroRotation, modulePositions);
