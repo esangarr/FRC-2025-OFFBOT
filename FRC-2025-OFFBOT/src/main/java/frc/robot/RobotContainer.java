@@ -57,12 +57,14 @@ public class RobotContainer {
   
     configureBindings();
 
+
   }
 
   private void configureBindings() {
     
     chassis.setDefaultCommand(DriveCommands.joystickDrive(chassis, ()-> -driver.getLeftY(), ()-> -driver.getLeftX(), ()-> -driver.getRightX()));
     driver.a().whileTrue(chassis.getPathFinder().toPoseCommand(new Pose2d(3.19,4.03, Rotation2d.kZero)));
+
   }
 
   public Command getAutonomousCommand() {

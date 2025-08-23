@@ -246,10 +246,9 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
         nav.update();
         
         if (nav.hasPose()) {
-            estimator.addVisionMeasurement(nav.getPose(), nav.timestamp() , nav.dev.asVector());
+            estimator.addVisionMeasurement(nav.getPose(), nav.getAppTimestamp().getAsDouble() , nav.dev.asVector());
         }
         
-
         estimator.update(rawGyroRotation, modulePositions);
 
         publishOutput("Odometry/BotPose", estimator.getEstimatedPosition());
