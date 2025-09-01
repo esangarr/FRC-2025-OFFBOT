@@ -29,7 +29,7 @@ public class Vision extends NetworkSubsystem{
 
     PhotonCamera camera ;
 
-    private static final AprilTagFieldLayout kTagLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+    private static final AprilTagFieldLayout kTagLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
     private final PhotonPoseEstimator photonEstimator ;
     private final EstimateConsumer estConsumer;
 

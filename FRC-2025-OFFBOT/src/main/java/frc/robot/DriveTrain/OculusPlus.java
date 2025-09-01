@@ -49,6 +49,7 @@ public class OculusPlus extends NetworkSubsystem{
         .getProtobufTopic("deviceData", deviceDataProto)
         .subscribe(Data.ProtobufQuestNavDeviceData.newInstance());
 
+    
     private final ProtobufSubscriber<Data.ProtobufQuestNavFrameData> frameDataSubscriber =
         questNavTable
             .getProtobufTopic("frameData", frameDataProto)
@@ -85,6 +86,7 @@ public class OculusPlus extends NetworkSubsystem{
         return false; 
     }
 
+    @AutoNetworkPublisher(key = "isConected")
     public boolean isConnected() {
         return Seconds.of(Timer.getTimestamp())
             .minus(Microseconds.of(frameDataSubscriber.getLastChange()))

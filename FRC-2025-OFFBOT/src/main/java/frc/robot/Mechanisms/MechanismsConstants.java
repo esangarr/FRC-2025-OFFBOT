@@ -22,7 +22,11 @@ public class MechanismsConstants {
 
     public class OutakeConstants {}
 
-    public class ElevatorConstants {}
+    public class ElevatorConstants {
+        public static final int Leader_ID = 0;
+        public static final int Follower_ID = 0;
+        
+    }
 
     public class ClimberConstants {}
 
