@@ -124,6 +124,7 @@ public class OculusPlus extends NetworkSubsystem{
         return result;
     }
 
+    @AutoNetworkPublisher(key = "robotPose")
     public Pose2d getPose(){
         PoseFrame[] poseFrames = getAllUnreadPoseFrames();
 
