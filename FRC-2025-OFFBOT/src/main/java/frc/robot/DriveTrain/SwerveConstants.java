@@ -35,7 +35,7 @@ public class SwerveConstants {
         public static final int DrivePort = 1; 
         public static final int TurnPort = 2; 
         public static final int EncPort = 21; 
-        public static final double offset = -0.499; 
+        public static final double offset = 0.017; 
  
         public static final boolean DrivemotorReversed = true;
         public static final boolean TurnmotorReversed = true;
@@ -47,7 +47,7 @@ public class SwerveConstants {
         public static final int DrivePort = 3; 
         public static final int TurnPort = 4; 
         public static final int EncPort = 22;
-        public static final double offset = -0.45;                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ; //48     //93  //138      //48 o 138 o 228
+        public static final double offset = 0.065;                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ; //48     //93  //138      //48 o 138 o 228
  
         public static final boolean DrivemotorReversed = true;
         public static final boolean TurnmotorReversed = true;
@@ -60,7 +60,7 @@ public class SwerveConstants {
         public static final int DrivePort = 5; 
         public static final int TurnPort = 6; 
         public static final int EncPort = 20; 
-        public static final double offset = -0.48;
+        public static final double offset = 0.021;
  
         public static final boolean DrivemotorReversed = true;
         public static final boolean TurnmotorReversed = true; 
@@ -72,7 +72,7 @@ public class SwerveConstants {
         public static final int DrivePort = 7; 
         public static final int TurnPort = 8; 
         public static final int EncPort = 19; 
-        public static final double offset = 0.09668; 
+        public static final double offset = -0.126; 
  
         public static final boolean DrivemotorReversed = true;
         public static final boolean TurnmotorReversed = true;
