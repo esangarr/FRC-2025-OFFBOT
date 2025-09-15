@@ -63,18 +63,16 @@ public class Control {
     public static class FeedForwardControl{
 
         public static ControlResult calculate(SimpleFeedForwardGains gains, double velocity, double acceleration){
-            return ()-> 
-            Math.signum(velocity) * gains.kS() +
-            gains.kV() * velocity +
-            gains.kA() * acceleration;
+            return ()-> Math.signum(velocity) * gains.kS() +gains.kV() * velocity + gains.kA() * acceleration;
         }
 
         public static ControlResult calculate(CompleteFeedForwardGains gains, double velocity, double acceleration){
-            return ()-> 
-            Math.signum(velocity) * gains.kS() +
-            gains.kG() +
-            gains.kV() * velocity +
-            gains.kA() * acceleration;
+            return ()-> Math.signum(velocity) * gains.kS() +gains.kG() +gains.kV() * velocity +gains.kA() * acceleration;
+        }
+
+        public static ControlResult calculate(CompleteFeedForwardGains ffgains) {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'calculate'");
         }
 
     }
@@ -108,7 +106,7 @@ public class Control {
 
         @Override
         public ControlResult calculate(Double setpoint, Double measurement){
-            return ()-> controller.calculate(setpoint, measurement);
+            return ()-> controller.calculate(measurement, setpoint);
         }
 
         @Override
@@ -140,6 +138,10 @@ public class Control {
 
         public PIDController getController(){
             return controller;
+        }
+
+        public boolean atSetpoint(){
+            return controller.atSetpoint();
         }
 
         public void reset(){

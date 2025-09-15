@@ -70,6 +70,30 @@ public class ProfileGains{
         }
     }
 
+    public static class VelocityGoal{
+
+        /*
+         * Velocity magnitude
+         */
+        public double velocity;
+        /*
+         * Acceleration magnitude
+         */
+        public double acceleration;
+
+        /**
+         * Represents a desired velocity and acceleration
+         * @param velocity the current velocity 
+         * @param acceleration the current system acceleration
+         */
+        public VelocityGoal(double velocity, double acceleration){
+            this.velocity = velocity;
+            this.acceleration = acceleration;
+        }
+
+
+    }
+
     public record SimpleFeedForwardGains(double kS, double kV, double kA) implements Gains{
 
         @Override
@@ -94,6 +118,7 @@ public class ProfileGains{
             builder.addStringProperty("GainsList", () -> java.util.Arrays.toString(toArray()), null);
         }
     }
+
 
     public record CompleteFeedForwardGains(double kS, double kV, double kA, double kG) implements Gains{
 
