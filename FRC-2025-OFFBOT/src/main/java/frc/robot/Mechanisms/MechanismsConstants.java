@@ -1,11 +1,14 @@
 package frc.robot.Mechanisms;
 
+import lib.ForgePlus.Math.Profiles.ProfileGains.CompleteFeedForwardGains;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 
 import edu.wpi.first.math.controller.PIDController;
 import lib.ForgePlus.Math.Profiles.ProfileGains.CompleteFeedForwardGains;
 import lib.ForgePlus.Math.Profiles.ProfileGains.PIDFGains;
+
 import lib.ForgePlus.Math.Profiles.ProfileGains.PIDGains;
 
 public class MechanismsConstants {
@@ -26,13 +29,42 @@ public class MechanismsConstants {
 
     }
 
-    public class IntakeConstants{}
+    public class IntakeConstants{
 
+        public static int IntAngle_ID = 10;
+        public static final int IntWheels_ID = 11;
+
+        public final static boolean Angulator = false;
+        public final static boolean IntakeWheels = false;
+
+        public final static int AngulatorCurrentLimit = 25;
+        public final static int IntWheelsCurrentLimit = 25;
+
+        public final static double pidTolerance = 0;
+
+        public final static double ffVelocity = 0;
+        public final static double ffAceleration = 0;
+        
+        public static final PIDGains pidGains = new PIDGains(0, 0, 0);
+        public static final CompleteFeedForwardGains FFgains = new CompleteFeedForwardGains(
+            0, 
+            0, 
+            0, 
+            0);
+
+    
+    }
 
     public class OutConstants {
 
         public final static int Wheels_ID = 0;
         public final static int arm_ID = 0;
+
+    public class OutConstants {
+
+        public final static int Wheels_ID = 0;
+        public final static int arm_ID = 0;
+
 
         public final static boolean armInveerted = false;
         public final static boolean wheeelsInveerted = false;
@@ -50,8 +82,7 @@ public class MechanismsConstants {
         public static final PIDGains pidGains = new PIDGains(0, 0, 0);
     
         public static final double MMAcceleration = 5000; //this is the medium point
-        public static final double MMCruiseVelocity = 5000;
-
+        public static final double MMCruiseVelocity = 5000
     }
 
     public class ElevatorConstants {
