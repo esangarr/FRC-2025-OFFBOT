@@ -38,11 +38,7 @@ public class DriveCommands {
             .getTranslation();
     }
 
-    public static Command joystickDrive(
-        Swerve drive,
-        DoubleSupplier xSupplier,
-        DoubleSupplier ySupplier,
-        DoubleSupplier omegaSupplier){
+    public static Command joystickDrive(Swerve drive,DoubleSupplier xSupplier,DoubleSupplier ySupplier,DoubleSupplier omegaSupplier){
     return Commands.run(
         () -> {
             // Apply deadband

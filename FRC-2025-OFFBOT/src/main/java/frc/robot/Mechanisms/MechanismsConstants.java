@@ -45,7 +45,8 @@ public class MechanismsConstants {
         public final static double ffVelocity = 0;
         public final static double ffAceleration = 0;
         
-        public static final PIDGains pidGains = new PIDGains(0, 0, 0);
+        public static final PIDGains pidGainsUp = new PIDGains(0, 0, 0);
+        public static final PIDGains pidGainsDown = new PIDGains(0, 0, 0);
         public static final CompleteFeedForwardGains FFgains = new CompleteFeedForwardGains(
             0, 
             0, 
@@ -55,11 +56,7 @@ public class MechanismsConstants {
     
     }
 
-    public class OutConstants {
-
-        public final static int Wheels_ID = 0;
-        public final static int arm_ID = 0;
-
+   
     public class OutConstants {
 
         public final static int Wheels_ID = 0;
@@ -79,10 +76,11 @@ public class MechanismsConstants {
         public final static double ffAceleration = 0;
 
         public static final CompleteFeedForwardGains FFgains = new CompleteFeedForwardGains(0, 0, 0, 0);
-        public static final PIDGains pidGains = new PIDGains(0, 0, 0);
+        public static final PIDGains pidGainsUp = new PIDGains(0, 0, 0);
+        public static final PIDGains pidGainsDown = new PIDGains(0, 0, 0);
     
         public static final double MMAcceleration = 5000; //this is the medium point
-        public static final double MMCruiseVelocity = 5000
+        public static final double MMCruiseVelocity = 5000;
     }
 
     public class ElevatorConstants {

@@ -24,84 +24,92 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.units.measure.Velocity;
+import edu.wpi.first.util.function.BooleanConsumer;
 import frc.robot.Mechanisms.MechanismsConstants;
 import frc.robot.Mechanisms.MechanismsConstants.IntakeConstants;
+import frc.robot.Mechanisms.MechanismsConstants.OutConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IntakeSub extends NetworkSubsystem{
 
-    private final ForgeSparkMax motorAng;
-    private final PIDControl pid;
+    private ForgeSparkMax motorAng;
+    private PIDControl pidUp;
+    private PIDControl pidDown;
 
-    private TalonFX KrakenIntake;
+    private TalonFX wheels;
     private TalonFXConfiguration IntConfigs;
 
-    private final SparkAbsoluteEncoder encoder;
+    private SparkAbsoluteEncoder encoder;
 
     public IntakeSub () {
         super("IntakeSubsystem", false);
 
-              // Motor Angulador
-              motorAng = new ForgeSparkMax(IntakeConstants.IntAngle_ID, "IntakeAngle");
-              encoder = motorAng.getAbsoluteEncoder();
-              pid = new PIDControl(IntakeConstants.pidGains);
+        // Motor Angulador
+        motorAng = new ForgeSparkMax(IntakeConstants.IntAngle_ID, "IntakeAngle");
+        encoder = motorAng.getAbsoluteEncoder();
+        pidUp = new PIDControl(IntakeConstants.pidGainsUp);
+        pidDown = new PIDControl(IntakeConstants.pidGainsDown);
 
-              //Config Motor Angulador
+        //Config Motor Angulador
 
-              motorAng.flashConfiguration(
-                MechanismsConstants.IntakeConstants.Angulator,
-                IdleMode.kCoast,
-                MechanismsConstants.IntakeConstants.AngulatorCurrentLimit,
-                false);
+        motorAng.flashConfiguration(
+        MechanismsConstants.IntakeConstants.Angulator,
+        IdleMode.kCoast,
+        MechanismsConstants.IntakeConstants.AngulatorCurrentLimit,
+        false);
         
-                pid.setTolerance(MechanismsConstants.IntakeConstants.pidTolerance);
+        pidUp.setTolerance(OutConstants.pidTolerance);
+        pidDown.setTolerance(OutConstants.pidTolerance);
 
-                //Motor Wheels
-                KrakenIntake = new TalonFX(IntakeConstants.IntWheels_ID);
+        //Motor Wheels
+        wheels = new TalonFX(IntakeConstants.IntWheels_ID);
             
 
-                //Config Motor Ruedas
+        //Config Motor Ruedas
+        IntConfigs.CurrentLimits.SupplyCurrentLimitEnable = false;
+        IntConfigs.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        IntConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-                IntConfigs.CurrentLimits.SupplyCurrentLimitEnable = false;
-                IntConfigs.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-                IntConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-
-                KrakenIntake.getConfigurator().apply(IntConfigs);
+        wheels.getConfigurator().apply(IntConfigs);
     }
 
 
     @Override
-    public void NetworkPeriodic(){ 
+    public void NetworkPeriodic(){ }
 
-    }
-
-     @AutoNetworkPublisher(key = "AngPosition")
-    private double getPosition(){ //Request Position
+    @AutoNetworkPublisher(key = "AngPosition")
+    private double getPosition(){ 
         return encoder.getPosition() * 360;     
     }
 
-    private void setPosition(double targetPosition) {
+    public void setPosition(double targetPosition) {
+        double output;
 
-        double ff = FeedForwardControl.calculate(
-            IntakeConstants.FFgains, 
-            IntakeConstants.ffVelocity, 
-            IntakeConstants.ffAceleration).getOutput();
+        if (targetPosition > 0){
+            double Up = pidUp.calculate(getPosition(), targetPosition).getOutput();
+            double ff = FeedForwardControl.calculate(OutConstants.FFgains, OutConstants.ffVelocity, OutConstants.ffAceleration).getOutput();
+            output = Up + ff;
+        }else{
+            double Down = pidDown.calculate(getPosition(), targetPosition).getOutput();
+            output = Down; 
+        }        
 
-        double PID = pid.calculate(getPosition(), targetPosition).getOutput();
-
-        double output = PID + ff;
         //output = Math.max(OutConstants.Wrist_MinOutput, Math.min(OutConstants.Wrist_MaxOutput, output));//clamp
         motorAng.set(output); 
     }
 
-    private void setVel (double speed){
-
+    public void runIntake(double speed){
         motorAng.set(speed);
     }
 
-    @AutoNetworkPublisher(key = "AngSetpoint")
-    private double currentSetpoint(){
-        return pid.getSetpoint();
+    @AutoNetworkPublisher(key = "CurrentSetpoint")
+    public double currentSetpoint(){
+        return pidUp.getSetpoint()*pidDown.getSetpoint() >= 0 ? pidUp.getSetpoint() : pidDown.getSetpoint();
+    }
+
+    @AutoNetworkPublisher(key = "AtGoal")
+    public boolean atGoal(){
+        return  (getPosition() - currentSetpoint()) <=  OutConstants.armTolerance;
     }
 
     //Obtener velocidad motorPID
@@ -109,24 +117,21 @@ public class IntakeSub extends NetworkSubsystem{
         return encoder.getVelocity();
     }
 
-    public void setvel(double speed) {  
-        KrakenIntake.set(speed);
+    public void runWheelsIntake(double speed) {  
+        wheels.set(speed);
     }
 
     public void stopAng() {
         motorAng.stopMotor();
-        
     }
 
-    public void stopWheels() {
-        KrakenIntake.stopMotor();
-        
+    public void stopWheelsIntake() {
+        wheels.stopMotor();
     }
 
-    public void stopAllInt() {
+    public void stopAll(){
         motorAng.stopMotor();
-        KrakenIntake.stopMotor();
-        
+        wheels.stopMotor();
     }
     
 }

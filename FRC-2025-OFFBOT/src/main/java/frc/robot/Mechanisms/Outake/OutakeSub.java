@@ -21,7 +21,8 @@ import lib.ForgePlus.REV.SparkMax.ForgeSparkMax;
 public class OutakeSub extends NetworkSubsystem{
 
     private ForgeSparkMax arm; 
-    private PIDControl pid;
+    private PIDControl pidUp;
+    private PIDControl pidDown;
 
     private TalonFX wheels;
     private TalonFXConfiguration wheelsConfig;
@@ -33,7 +34,8 @@ public class OutakeSub extends NetworkSubsystem{
         super("OutakeSubsystem", false);
 
         arm = new ForgeSparkMax(OutConstants.arm_ID,"OutakeAngle");
-        pid = new PIDControl(OutConstants.pidGains);
+        pidUp = new PIDControl(OutConstants.pidGainsUp);
+        pidDown = new PIDControl(OutConstants.pidGainsDown);
 
         wheels = new TalonFX(OutConstants.Wheels_ID);
         wheels.setNeutralMode(NeutralModeValue.Brake);
@@ -51,22 +53,31 @@ public class OutakeSub extends NetworkSubsystem{
             false);
 
 
-        pid.setTolerance(OutConstants.pidTolerance);
+        pidUp.setTolerance(OutConstants.pidTolerance);
+        pidDown.setTolerance(OutConstants.pidTolerance);
     }
 
     @Override
     public void NetworkPeriodic(){}
 
-    @AutoNetworkPublisher(key = "Position")
-    private double getPosition(){ //Request Position
+    @AutoNetworkPublisher(key = "ArmPosition")
+    private double getPosition(){ 
         return encoder.getPosition() * 360; 
     }
 
     private void setPosition(double targetPosition) {
-        double ff = FeedForwardControl.calculate(OutConstants.FFgains, OutConstants.ffVelocity, OutConstants.ffAceleration).getOutput();
-        double PID = pid.calculate(getPosition(), targetPosition).getOutput();
 
-        double output = PID + ff;
+        double output;
+
+        if (targetPosition > 0){
+            double Up = pidUp.calculate(getPosition(), targetPosition).getOutput();
+            double ff = FeedForwardControl.calculate(OutConstants.FFgains, OutConstants.ffVelocity, OutConstants.ffAceleration).getOutput();
+            output = Up + ff;
+        }else{
+            double Down = pidDown.calculate(getPosition(), targetPosition).getOutput();
+            output = Down; 
+        }        
+
         //output = Math.max(OutConstants.Wrist_MinOutput, Math.min(OutConstants.Wrist_MaxOutput, output));//clamp
         arm.set(output); 
     }
@@ -75,25 +86,29 @@ public class OutakeSub extends NetworkSubsystem{
         arm.set(speed);
     }
 
-    private void runWheels(double speed){
+    private void runWheelsOutake(double speed){
         wheels.set(speed);
     }
 
     @AutoNetworkPublisher(key = "CurrentSetpoint")
     private double currentSetpoint(){
-        return pid.getSetpoint();
+        return pidUp.getSetpoint()*pidDown.getSetpoint() >= 0 ? pidUp.getSetpoint() : pidDown.getSetpoint();
+    }
+
+    public boolean isWheelSpinning(){
+        return wheels.get() != 0;
     }
 
     @AutoNetworkPublisher(key = "AtGoal")
     private boolean atGoal(){
-        return (getPosition() - currentSetpoint()) <=  OutConstants.armTolerance;
+        return  (getPosition() - currentSetpoint()) <=  OutConstants.armTolerance;
     }
 
     private void stopArm(){
         arm.stopMotor();
     }
 
-    private void stopwheels(){
+    private void stopwheelsOutake(){
        wheels.stopMotor();
     }
 
