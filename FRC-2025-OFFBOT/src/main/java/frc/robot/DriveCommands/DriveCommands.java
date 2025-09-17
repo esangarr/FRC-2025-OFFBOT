@@ -15,6 +15,7 @@ import frc.robot.DriveTrain.Swerve;
 import lib.ForgePlus.Math.Profiles.Control.MotionModelControl;
 import lib.ForgePlus.Math.Profiles.Control.PositionState;
 import lib.ForgePlus.Math.Profiles.ProfileGains.MotionModelGains;
+import lib.ForgePlus.REV.REVBlinkin.REVBlinkin.PatternType;
 import lib.ForgePlus.SwerveLib.Odometer.OdometerUtils;
 
 public class DriveCommands {
@@ -119,5 +120,26 @@ public class DriveCommands {
             
             .beforeStarting(()-> angleController.reset(drive.getRotation().getRadians(), 0));
     }
+
+    public static Command brake(Swerve drive){
+        return Commands.run(()->{drive.stopWithX();}, drive);
+    }
+
+    public static Command moveInX(Swerve drive, double speed){
+        return Commands.run(()-> {
+            drive.runVelocity(new ChassisSpeeds(0, speed, 0));
+        }, drive);
+     }
+
+  public static Command moveInY(Swerve drive, double speed){
+    return Commands.run(()-> {
+        drive.runVelocity(new ChassisSpeeds(speed,0, 0));}, drive);
+    }   
+
+    public static Command resetHeading(Swerve drive){
+        return Commands.runOnce(()-> {drive.resetHeading();});
+    }
+
+
 
 }

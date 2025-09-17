@@ -19,11 +19,14 @@ import frc.robot.DriveTrain.Swerve.SwervePathConstraints;
 import frc.robot.DriveTrain.Vision;
 import lib.ForgePlus.NetworkTableUtils.NTPublisher;
 import lib.ForgePlus.NetworkTableUtils.NTSendableChooser;
+import lib.ForgePlus.SwerveLib.Utils.Smoothjoystick;
 
 public class RobotContainer {
 
   private final Swerve chassis;
   private final Vision vision;
+
+  private final Smoothjoystick smooth = new Smoothjoystick(1.1);
 
   private final CommandXboxController driver = new CommandXboxController(0);
 
@@ -61,9 +64,21 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
+
+    chassis.setDefaultCommand(DriveCommands.joystickDrive(
+      chassis,
+      smooth.filter(()-> -driver.getLeftY() * 0.9),
+      smooth.filter(()-> -driver.getLeftX() * 0.9),
+      smooth.filter(()-> -driver.getRightX() * 0.8)));
     
-    chassis.setDefaultCommand(DriveCommands.joystickDrive(chassis, ()-> -driver.getLeftY(), ()-> -driver.getLeftX(), ()-> -driver.getRightX()));
+    chassis.setDefaultCommand(DriveCommands.joystickDrive(chassis, ()-> driver.getLeftY(), ()-> driver.getLeftX(), ()-> -driver.getRightX()));
     driver.a().whileTrue(chassis.getPathFinder().toPoseCommand(new Pose2d(3.19,4.03, Rotation2d.kZero)));
+    driver.y().whileTrue(DriveCommands.resetHeading(chassis));
+
+    driver.povLeft().whileTrue(DriveCommands.moveInX(chassis, 0.6));
+    driver.povRight().whileTrue(DriveCommands.moveInX(chassis, -0.6));
+    driver.povUp().whileTrue(DriveCommands.moveInY(chassis, 0.6));
+    driver.povDown().whileTrue(DriveCommands.moveInY(chassis,-0.6));
 
   }
 
