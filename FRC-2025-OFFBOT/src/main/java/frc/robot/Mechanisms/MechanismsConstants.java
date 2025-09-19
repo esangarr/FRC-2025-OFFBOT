@@ -31,11 +31,10 @@ public class MechanismsConstants {
 
     public class IntakeConstants{
 
-        public static int IntAngle_ID = 10;
-        public static final int IntWheels_ID = 11;
+        public static int IntAngle_ID = 0;
+        public static final int IntWheels_ID = 0;
 
-        public final static boolean Angulator = false;
-        public final static boolean IntakeWheels = false;
+        public final static boolean AngulatorInverted = false;
 
         public final static int AngulatorCurrentLimit = 25;
         public final static int IntWheelsCurrentLimit = 25;
@@ -44,6 +43,8 @@ public class MechanismsConstants {
 
         public final static double ffVelocity = 0;
         public final static double ffAceleration = 0;
+
+        public final static double GaerRatio = 17.9;
         
         public static final PIDGains pidGainsUp = new PIDGains(0, 0, 0);
         public static final PIDGains pidGainsDown = new PIDGains(0, 0, 0);

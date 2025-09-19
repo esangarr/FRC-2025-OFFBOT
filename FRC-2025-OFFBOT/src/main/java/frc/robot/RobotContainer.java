@@ -16,6 +16,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.DriveCommands.DriveCommands;
 import frc.robot.DriveTrain.Swerve;
 import frc.robot.DriveTrain.Swerve.SwervePathConstraints;
+import frc.robot.MecaCommands.IntakeCommands.IntakeCommands;
+//import frc.robot.Mechanisms.Indexer.IndexerSub;
+import frc.robot.Mechanisms.Intake.IntakeSub;
 import frc.robot.DriveTrain.Vision;
 import lib.ForgePlus.NetworkTableUtils.NTPublisher;
 import lib.ForgePlus.NetworkTableUtils.NTSendableChooser;
@@ -26,9 +29,14 @@ public class RobotContainer {
   private final Swerve chassis;
   private final Vision vision;
 
+  private final IntakeSub intake;
+  //private final IndexerSub index;
+
+
   private final Smoothjoystick smooth = new Smoothjoystick(1.1);
 
-  private final CommandXboxController driver = new CommandXboxController(0);
+  private CommandXboxController driver = new CommandXboxController(0);
+  private CommandXboxController operator = new CommandXboxController(1);
 
   private PathPlannerAuto lateral;
   private PathPlannerAuto mover;
@@ -44,7 +52,10 @@ public class RobotContainer {
     vision = new Vision("Arducam_1",     
                         new Transform3d(new Translation3d(0-.2583434, -0.3018282, 0.206375), new Rotation3d(0.491, 0, 0.869)),//Poner posicion de la camara respecto al robot  
                         chassis::addVisionMeasurement);
-                          
+    
+    intake = new IntakeSub();
+    //index = new IndexerSub();
+
     NTPublisher.publish("Joysticks", "Driver1", driver);
   
     lateral = new PathPlannerAuto("lat");
@@ -65,6 +76,8 @@ public class RobotContainer {
 
   private void configureBindings() {
 
+    //---------------------------------------------------------------- DRIVER ----------------------------------------------------------------
+
     chassis.setDefaultCommand(DriveCommands.joystickDrive(
       chassis,
       smooth.filter(()-> -driver.getLeftY() * 0.9),
@@ -79,6 +92,18 @@ public class RobotContainer {
     driver.povRight().whileTrue(DriveCommands.moveInX(chassis, -0.6));
     driver.povUp().whileTrue(DriveCommands.moveInY(chassis, 0.6));
     driver.povDown().whileTrue(DriveCommands.moveInY(chassis,-0.6));
+
+    //---------------------------------------------------------------- DRIVER ----------------------------------------------------------------
+
+    //---------------------------------------------------------------- OPERATOR ----------------------------------------------------------------
+
+    driver.leftStick().whileTrue(IntakeCommands.runIntakeManual(intake, ()-> operator.getLeftY() * 0.2));
+    driver.b().whileTrue(IntakeCommands.setAngle(intake, 45));
+    driver.a().whileTrue(IntakeCommands.runIntakeWheels(intake, 1));
+   // driver.b().whileTrue(IntakeCommands.eatPieceNoBeam(intake, index, 0, 1, 1));
+
+    //---------------------------------------------------------------- OPERATOR ----------------------------------------------------------------
+
 
   }
 

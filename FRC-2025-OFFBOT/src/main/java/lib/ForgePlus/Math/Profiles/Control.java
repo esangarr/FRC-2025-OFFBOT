@@ -71,7 +71,6 @@ public class Control {
         }
 
         public static ControlResult calculate(CompleteFeedForwardGains ffgains) {
-            // TODO Auto-generated method stub
             throw new UnsupportedOperationException("Unimplemented method 'calculate'");
         }
 

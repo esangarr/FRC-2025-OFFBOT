@@ -1,4 +1,4 @@
-package frc.robot.Mechanisms.Indexer;
+/*package frc.robot.Mechanisms.Indexer;
 
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -9,7 +9,7 @@ import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.NetworkSubsystem;
 
 public class IndexerSub extends NetworkSubsystem{
 
-    private final ForgeSparkMax rightWheels, leftWheels;
+    private final ForgeSparkMax wheels;
 
     private final DigitalInput BeamSensor;
 
@@ -19,29 +19,21 @@ public class IndexerSub extends NetworkSubsystem{
 
         BeamSensor = new DigitalInput(IndexerConstants.DIO_PORT_SENSOR); 
 
-        rightWheels = new ForgeSparkMax(IndexerConstants.RightWheels_ID, "IndexerRightWheels");
-        leftWheels = new ForgeSparkMax(IndexerConstants.LeftWheels_ID, "IndexerLeftWheels");
+        wheels = new ForgeSparkMax(IndexerConstants.RightWheels_ID, "IndexerRightWheels");
 
-        rightWheels.flashConfiguration(
+        wheels.flashConfiguration(
             IndexerConstants.RightInverted,
             IdleMode.kCoast,
             IndexerConstants.RightWheelsCurrentLimit,
             false);
 
-        leftWheels.flashConfiguration(
-            IndexerConstants.LeftInverted,
-            IdleMode.kCoast,
-            IndexerConstants.LeftWheelsCurrentLimit,
-            false);
-     
     }
 
     @Override
     public void NetworkPeriodic(){ }
 
     public void runWheels(double speed){
-        rightWheels.set(speed);
-        leftWheels.set(speed);
+        wheels.set(speed);
     }
 
     @AutoNetworkPublisher(key = "hasPiece")
@@ -50,14 +42,13 @@ public class IndexerSub extends NetworkSubsystem{
     }
 
     public boolean isWheelSpinning(){
-        boolean spinning = (rightWheels.get() != 0 && leftWheels.get() != 0);
+        boolean spinning = (wheels.get() != 0);
 
         return spinning;
     }
 
     public void stop(){
-        rightWheels.stopMotor();
-        leftWheels.stopMotor();
+        wheels.stopMotor();
     }
 
 
@@ -65,4 +56,4 @@ public class IndexerSub extends NetworkSubsystem{
 
 
     
-}
+}*/

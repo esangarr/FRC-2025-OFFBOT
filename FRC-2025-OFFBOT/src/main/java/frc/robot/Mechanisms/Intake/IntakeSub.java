@@ -6,12 +6,6 @@ import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.NetworkSubsystem;
 import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.Annotations.AutoNetworkPublisher;
 import lib.ForgePlus.REV.SparkMax.ForgeSparkMax;
 
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -19,16 +13,9 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
-import com.revrobotics.spark.SparkClosedLoopController;
-
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.units.measure.Velocity;
-import edu.wpi.first.util.function.BooleanConsumer;
 import frc.robot.Mechanisms.MechanismsConstants;
 import frc.robot.Mechanisms.MechanismsConstants.IntakeConstants;
 import frc.robot.Mechanisms.MechanismsConstants.OutConstants;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IntakeSub extends NetworkSubsystem{
 
@@ -39,32 +26,30 @@ public class IntakeSub extends NetworkSubsystem{
     private TalonFX wheels;
     private TalonFXConfiguration IntConfigs;
 
-    private SparkAbsoluteEncoder encoder;
+    //private SparkAbsoluteEncoder encoder;
+    private RelativeEncoder relEncoder;
 
     public IntakeSub () {
         super("IntakeSubsystem", false);
 
-        // Motor Angulador
         motorAng = new ForgeSparkMax(IntakeConstants.IntAngle_ID, "IntakeAngle");
-        encoder = motorAng.getAbsoluteEncoder();
+        wheels = new TalonFX(IntakeConstants.IntWheels_ID);
+
+        //encoder = motorAng.getAbsoluteEncoder();
+        relEncoder = motorAng.getEncoder();
         pidUp = new PIDControl(IntakeConstants.pidGainsUp);
         pidDown = new PIDControl(IntakeConstants.pidGainsDown);
 
         //Config Motor Angulador
-
         motorAng.flashConfiguration(
-        MechanismsConstants.IntakeConstants.Angulator,
+        MechanismsConstants.IntakeConstants.AngulatorInverted,
         IdleMode.kCoast,
         MechanismsConstants.IntakeConstants.AngulatorCurrentLimit,
         false);
         
         pidUp.setTolerance(OutConstants.pidTolerance);
         pidDown.setTolerance(OutConstants.pidTolerance);
-
-        //Motor Wheels
-        wheels = new TalonFX(IntakeConstants.IntWheels_ID);
-            
-
+        
         //Config Motor Ruedas
         IntConfigs.CurrentLimits.SupplyCurrentLimitEnable = false;
         IntConfigs.MotorOutput.NeutralMode = NeutralModeValue.Coast;
@@ -79,7 +64,11 @@ public class IntakeSub extends NetworkSubsystem{
 
     @AutoNetworkPublisher(key = "AngPosition")
     private double getPosition(){ 
-        return encoder.getPosition() * 360;     
+        return (relEncoder.getPosition() / 17.9) * 360;     
+    }
+
+    public void setEncoderPosition(double position) {
+        relEncoder.setPosition(position);
     }
 
     public void setPosition(double targetPosition) {
@@ -94,7 +83,6 @@ public class IntakeSub extends NetworkSubsystem{
             output = Down; 
         }        
 
-        //output = Math.max(OutConstants.Wrist_MinOutput, Math.min(OutConstants.Wrist_MaxOutput, output));//clamp
         motorAng.set(output); 
     }
 
@@ -102,6 +90,7 @@ public class IntakeSub extends NetworkSubsystem{
         motorAng.set(speed);
     }
 
+    
     @AutoNetworkPublisher(key = "CurrentSetpoint")
     public double currentSetpoint(){
         return pidUp.getSetpoint()*pidDown.getSetpoint() >= 0 ? pidUp.getSetpoint() : pidDown.getSetpoint();
@@ -114,7 +103,7 @@ public class IntakeSub extends NetworkSubsystem{
 
     //Obtener velocidad motorPID
     public double getVelocity() {
-        return encoder.getVelocity();
+        return relEncoder.getVelocity();
     }
 
     public void runWheelsIntake(double speed) {  

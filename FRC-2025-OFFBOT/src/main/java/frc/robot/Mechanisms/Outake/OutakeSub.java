@@ -1,3 +1,4 @@
+/* 
 package frc.robot.Mechanisms.Outake;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -116,6 +117,6 @@ public class OutakeSub extends NetworkSubsystem{
        wheels.stopMotor();
         arm.stopMotor();
     }
-}
+}*/
     
 
