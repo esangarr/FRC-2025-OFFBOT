@@ -16,8 +16,8 @@ public class MechanismsConstants {
     // Hay que poner los ID'S de motores y sensores correctos
     public class IndexerConstants{
 
-        public static final int RightWheels_ID = 0;
-        public static final int LeftWheels_ID = 0;
+        public static final int RightWheels_ID = 9;
+        public static final int LeftWheels_ID = 10;
 
         public static final boolean RightInverted = false;
         public static final boolean LeftInverted = false;
@@ -60,8 +60,8 @@ public class MechanismsConstants {
    
     public class OutConstants {
 
-        public final static int Wheels_ID = 0;
-        public final static int arm_ID = 0;
+        public final static int Wheels_ID = 17;
+        public final static int arm_ID = 13;
 
 
         public final static boolean armInveerted = false;
