@@ -9,12 +9,13 @@ public class SwerveConstants {
     public static final double MAX_LINEAR_SPEED = Units.feetToMeters(19.0);
     public static final double TRACK_WIDTH_X = Units.inchesToMeters(28); 
     public static final double TRACK_WIDTH_Y = Units.inchesToMeters(32); 
-    public static final double DRIVE_BASE_RADIUS =
-        Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
+    public static final double DRIVE_BASE_RADIUS = Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
     public static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
 
     public static final double ROBOTMASSKG = 57.45;
     public static final double ROBOTMOI = 5.16;
+
+    public static final int pigeon_ID = 0;
 
     public static final PathConstraints fastPathConstraints = new PathConstraints(
         4.5,

@@ -1,5 +1,6 @@
-/*package frc.robot.DriveTrain;
+package frc.robot.DriveTrain;
 
+import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
@@ -40,7 +41,8 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
  public class Swerve extends NetworkSubsystem implements SimulatedSubsystem{
 
     @RealDevice
-    private final AHRS navX;
+    //private final AHRS navX;
+    private final Pigeon2 pigeon;
 
     private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleLocations());
 
@@ -84,12 +86,13 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
             constraints == SwervePathConstraints.kNormal);
 
         if (isInSimulation()) {
-            navX = null;
+            //navX = null;
+            pigeon = null;
             translationPPgains = new PIDConstants(5.0, 0,0);
             rotationPPgains = new PIDConstants(5.0, 0,0);
         }else{
-            navX = new AHRS(NavXComType.kMXP_SPI);
-
+            //navX = new AHRS(NavXComType.kMXP_SPI);
+            pigeon = new Pigeon2(SwerveConstants.pigeon_ID);
             translationPPgains = new PIDConstants(5.5, 0, 0); 
             rotationPPgains = new PIDConstants(2.93, 0.0, 0.001);
         }
@@ -103,7 +106,8 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
             new Thread(() -> {
                 try{
                     Thread.sleep(1000);
-                    navX.reset();
+                    //navX.reset();
+                    pigeon.reset();
                     nav.resetPose();
                 
                 } catch (Exception e){
@@ -199,11 +203,12 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
         if (isInSimulation()) {
             return false;
         }
-        return navX.isConnected();
+        return pigeon.isConnected();
+        //return navX.isConnected();
     }
 
     public double getAngle(){
-        return Math.IEEEremainder(navX.getAngle(), 360);
+        return Math.IEEEremainder(pigeon.getYaw().getValueAsDouble(), 360);
     }
 
     public Rotation2d getnavXRotation(){
@@ -405,4 +410,4 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
     public double getMaxAngularSpeedRadPerSec() {
         return SwerveConstants.MAX_ANGULAR_SPEED;
     }
-}*/
+}
