@@ -1,10 +1,11 @@
-package frc.robot.MecaCommands.IntakeCommands;
+/*package frc.robot.MecaCommands.IntakeCommands;
 
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Mechanisms.Indexer.IndexerSub;
 //import frc.robot.Mechanisms.Indexer.IndexerSub;
 import frc.robot.Mechanisms.Intake.IntakeSub;
 
@@ -12,12 +13,9 @@ public class IntakeCommands {
 
     public static Command setAngle(IntakeSub intake, double angle){
 
-        return Commands.run(()-> {
-            intake.setPosition(angle);
-        },
-        intake);
+        return Commands.run(()-> {intake.setPosition(angle);},intake);
     }
-/* 
+
     public static Command eatPiece(
         IntakeSub intake,
         IndexerSub index,
@@ -58,7 +56,7 @@ public class IntakeCommands {
             intake.stopAll();
             index.stop();});
     }
-*/
+
 
     public static Command runIntakeWheels(IntakeSub intake, double speed){
         return Commands.run(()-> {
@@ -72,7 +70,12 @@ public class IntakeCommands {
         }, intake).finallyDo(()->{intake.stopAng();});
     }
 
+    public static Command moveIntSpeed(IntakeSub intake, double speed){
+        return Commands.run(()->{
+            intake.runIntake(speed);
+        }, intake).finallyDo(()->{intake.stopAng();});
+    }
 
 
 
-}
+}*/

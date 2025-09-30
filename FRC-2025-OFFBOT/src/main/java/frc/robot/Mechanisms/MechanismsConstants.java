@@ -31,13 +31,13 @@ public class MechanismsConstants {
 
     public class IntakeConstants{
 
-        public static int IntAngle_ID = 0;
-        public static final int IntWheels_ID = 0;
+        public static final int IntAngle_ID = 11;
+        public static final int IntWheels_ID = 13;
 
         public final static boolean AngulatorInverted = false;
 
-        public final static int AngulatorCurrentLimit = 25;
-        public final static int IntWheelsCurrentLimit = 25;
+        public final static int AngulatorCurrentLimit = 0;
+        public final static int IntWheelsCurrentLimit = 0;
 
         public final static double pidTolerance = 0;
 
@@ -85,8 +85,8 @@ public class MechanismsConstants {
     }
 
     public class ElevatorConstants {
-        public static final int Leader_ID = 0;
-        public static final int Follower_ID = 0;
+        public static final int Leader_ID = 15;
+        public static final int Follower_ID = 16;
         
     }
 

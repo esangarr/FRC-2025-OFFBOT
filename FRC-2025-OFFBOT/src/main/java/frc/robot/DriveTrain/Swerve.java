@@ -1,4 +1,4 @@
-package frc.robot.DriveTrain;
+/*package frc.robot.DriveTrain;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.ModuleConfig;
@@ -352,7 +352,7 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
         );
     }
 
-    @AutoNetworkPublisher(key = "Modules/ModuleStates")
+    @AutoNetworkPublisher(key = "Speeds/ModuleStates")
     public SwerveModuleState[] getModuleStates() {
         SwerveModuleState[] states = new SwerveModuleState[4];
         for (int i = 0; i < 4; i++) {
@@ -361,7 +361,7 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
         return states;
     }
 
-    @AutoNetworkPublisher(key = "Modules/ModulePositions")
+    @AutoNetworkPublisher(key = "ModulePositions")
     public SwerveModulePosition[] getModulePositions() {
         SwerveModulePosition[] states = new SwerveModulePosition[4];
         for (int i = 0; i < 4; i++) {
@@ -370,7 +370,7 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
         return states;
     }
 
-    @AutoNetworkPublisher(key = "Modules/ChassisSpeeds")
+    @AutoNetworkPublisher(key = "ChassisSpeeds")
     public ChassisSpeeds getChassisSpeeds(){
       return kinematics.toChassisSpeeds(getModuleStates());
     } 
@@ -397,14 +397,12 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
     }
 
     @AutoNetworkPublisher(key = "Speeds/MaxLinear") 
-    /** Returns the maximum linear speed in meters per sec. */
     public double getMaxLinearSpeedMetersPerSec() {
         return SwerveConstants.MAX_LINEAR_SPEED;
     }
 
     @AutoNetworkPublisher(key = "Speeds/MaxAngular")      
-    /** Returns the maximum angular speed in radians per sec. */
     public double getMaxAngularSpeedRadPerSec() {
         return SwerveConstants.MAX_ANGULAR_SPEED;
     }
-}
+}*/

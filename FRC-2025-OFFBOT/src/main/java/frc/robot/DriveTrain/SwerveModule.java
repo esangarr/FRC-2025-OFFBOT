@@ -77,7 +77,7 @@ public class SwerveModule implements SimulatedSubsystem{
         if (!isInSimulation()) {
             this.turnPIDGains = new PIDGains(5.0, 0,0);
             this.drivePIDGains = new PIDGains(0.05, 0, 0);
-            this.driveFFGains = new SimpleFeedForwardGains(0.1, 0.08, 0);
+            this.driveFFGains = new SimpleFeedForwardGains(0.1, 0.04, 0);
             
             createSparks(index);
 

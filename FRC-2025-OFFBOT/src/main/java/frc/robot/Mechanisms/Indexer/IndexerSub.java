@@ -9,7 +9,7 @@ import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.NetworkSubsystem;
 
 public class IndexerSub extends NetworkSubsystem{
 
-    private final ForgeSparkMax wheels;
+    private final ForgeSparkMax leftMot, rightMot;
 
     private final DigitalInput BeamSensor;
 
@@ -19,9 +19,16 @@ public class IndexerSub extends NetworkSubsystem{
 
         BeamSensor = new DigitalInput(IndexerConstants.DIO_PORT_SENSOR); 
 
-        wheels = new ForgeSparkMax(IndexerConstants.RightWheels_ID, "IndexerRightWheels");
+        leftMot = new ForgeSparkMax(IndexerConstants.RightWheels_ID, "IndexerLeftWheels");
+        rightMot = new ForgeSparkMax(IndexerConstants.RightWheels_ID, "IndexerRightWheels");
 
-        wheels.flashConfiguration(
+        leftMot.flashConfiguration(
+            IndexerConstants.LeftInverted,
+            IdleMode.kCoast,
+            IndexerConstants.LeftWheelsCurrentLimit,
+            false);
+        
+        rightMot.flashConfiguration(
             IndexerConstants.RightInverted,
             IdleMode.kCoast,
             IndexerConstants.RightWheelsCurrentLimit,
@@ -33,7 +40,8 @@ public class IndexerSub extends NetworkSubsystem{
     public void NetworkPeriodic(){ }
 
     public void runWheels(double speed){
-        wheels.set(speed);
+        leftMot.set(speed);
+        rightMot.set(speed);
     }
 
     @AutoNetworkPublisher(key = "hasPiece")
@@ -42,13 +50,14 @@ public class IndexerSub extends NetworkSubsystem{
     }
 
     public boolean isWheelSpinning(){
-        boolean spinning = (wheels.get() != 0);
+        boolean spinning = (rightMot.get() != 0 && leftMot.get() != 0);
 
         return spinning;
     }
 
     public void stop(){
-        wheels.stopMotor();
+        rightMot.stopMotor();
+        leftMot.stopMotor();
     }
 
 

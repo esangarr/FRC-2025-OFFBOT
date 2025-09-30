@@ -1,4 +1,4 @@
-/* 
+
 package frc.robot.Mechanisms.Elevator;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -41,7 +41,20 @@ public class ElevatorSub extends NetworkSubsystem{
 
     }
 
+    public void runMot(double speed){
+        leader.set(speed);
+        follower.set(speed);
+    }
+
+    public void StopMotors (){
+
+        leader.stopMotor();
+        follower.stopMotor();
+    }
+
+
+
     @Override
     public void NetworkPeriodic() {}
     
-}*/
+}
