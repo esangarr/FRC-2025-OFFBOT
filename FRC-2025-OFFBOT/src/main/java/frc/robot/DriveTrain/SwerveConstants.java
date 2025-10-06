@@ -15,7 +15,7 @@ public class SwerveConstants {
     public static final double ROBOTMASSKG = 57.45;
     public static final double ROBOTMOI = 5.16;
 
-    public static final int pigeon_ID = 0;
+    public static final int pigeon_ID = 25;
 
     public static final PathConstraints fastPathConstraints = new PathConstraints(
         4.5,

@@ -207,12 +207,25 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
         //return navX.isConnected();
     }
 
+    public double getPigAngle(){
+        var angleSignal = pigeon.getYaw();
+
+        double anglePos = angleSignal.getValueAsDouble();
+
+        var yawLatency = angleSignal.getTimestamp().getLatency();
+
+        angleSignal.waitForUpdate(0.020);
+
+        return anglePos;
+
+    }
+
     public double getAngle(){
-        return Math.IEEEremainder(pigeon.getYaw().getValueAsDouble(), 360);
+        return Math.IEEEremainder(getPigAngle(), 360);
     }
 
     public Rotation2d getnavXRotation(){
-        return Rotation2d.fromDegrees(-getAngle());
+        return Rotation2d.fromDegrees(getAngle());
     }
 
     

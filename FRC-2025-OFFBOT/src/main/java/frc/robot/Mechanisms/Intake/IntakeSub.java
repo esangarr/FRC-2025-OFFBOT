@@ -1,4 +1,4 @@
-/*package frc.robot.Mechanisms.Intake;
+package frc.robot.Mechanisms.Intake;
 
 import lib.ForgePlus.Math.Profiles.Control.FeedForwardControl;
 import lib.ForgePlus.Math.Profiles.Control.PIDControl;
@@ -8,6 +8,7 @@ import lib.ForgePlus.REV.SparkMax.ForgeSparkMax;
 
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -30,19 +31,19 @@ public class IntakeSub extends NetworkSubsystem{
     private TalonFX wheels;
     private TalonFXConfiguration IntConfigs;
 
-    //private SparkAbsoluteEncoder encoder;
-    private RelativeEncoder relEncoder;
+    private SparkAbsoluteEncoder encoder;
 
     public IntakeSub () {
         super("IntakeSubsystem", false);
 
-        motorAng = new ForgeSparkMax(11, "IntakeAngle");
+        motorAng = new ForgeSparkMax(IntakeConstants.IntAngle_ID, "IntakeAngle");
         wheels = new TalonFX(IntakeConstants.IntWheels_ID);
 
-        //encoder = motorAng.getAbsoluteEncoder();
-        relEncoder = motorAng.getEncoder();
+        encoder = motorAng.getAbsoluteEncoder();
         pidUp = new PIDControl(IntakeConstants.pidGainsUp);
         pidDown = new PIDControl(IntakeConstants.pidGainsDown);
+
+
 
         //Config Motor Angulador
         motorAng.flashConfiguration(
@@ -67,32 +68,38 @@ public class IntakeSub extends NetworkSubsystem{
 
     @Override
     public void NetworkPeriodic(){
-        SmartDashboard.putNumber("Encoder", relEncoder.getPosition());
-        SmartDashboard.putNumber("Angiulo", getPositionAng());
+        SmartDashboard.putNumber("Encoder", encoder.getPosition());
+        SmartDashboard.putNumber("Angulo", getPositionAng());
+        
+
      }
+
 
     @AutoNetworkPublisher(key = "AngPosition")
     private double getPositionAng(){ 
-        return (relEncoder.getPosition() / 17.9) * 360;     
+        return (encoder.getPosition()  * 360); 
+
     }
 
-    public void setEncoderPosition(double position) {
-        relEncoder.setPosition(position);
-    }
 
-    public void setPosition(double targetPosition) {
+    public void setPositionUp(double targetPosition) {
+
         double output;
 
-        if (targetPosition > 0){
-            double Up = pidUp.calculate(getPositionAng(), targetPosition).getOutput();
-            double ff = FeedForwardControl.calculate(OutConstants.FFgains, OutConstants.ffVelocity, OutConstants.ffAceleration).getOutput();
-            output = Up + ff;
-        }else{
-            double Down = pidDown.calculate(getPositionAng(), targetPosition).getOutput();
-            output = Down; 
-        }        
+        output = pidUp.calculate(targetPosition, getPositionAng()).getOutput();
 
-        motorAng.set(output); 
+        motorAng.set(output);
+
+    }
+
+    public void setPositionDown(double targetPosition) {
+
+        double output;
+
+        output = pidDown.calculate(targetPosition, getPositionAng()).getOutput();
+
+        motorAng.set(output);
+
     }
 
     public void runIntake(double speed){
@@ -107,12 +114,12 @@ public class IntakeSub extends NetworkSubsystem{
 
     @AutoNetworkPublisher(key = "AtGoal")
     public boolean atGoal(){
-        return  (getPositionAng() - currentSetpoint()) <=  OutConstants.armTolerance;
+        return  (getPositionAng() - currentSetpoint()) <=  IntakeConstants.intakeTolerance;
     }
 
     //Obtener velocidad motorPID
     public double getVelocity() {
-        return relEncoder.getVelocity();
+        return encoder.getVelocity();
     }
 
     public void runWheelsIntake(double speed) {  
@@ -132,5 +139,5 @@ public class IntakeSub extends NetworkSubsystem{
         wheels.stopMotor();
     }
     
-}*/
+}
 

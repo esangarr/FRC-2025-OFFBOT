@@ -1,19 +1,15 @@
-/* 
+
 package frc.robot.Mechanisms.Outake;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.spark.SparkAbsoluteEncoder;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
-import edu.wpi.first.math.controller.PIDController;
-import frc.robot.Mechanisms.MechanismsConstants.IndexerConstants;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Mechanisms.MechanismsConstants.OutConstants;
-import lib.ForgePlus.Math.Profiles.Control.ControlResult;
-import lib.ForgePlus.Math.Profiles.Control.FeedForwardControl;
 import lib.ForgePlus.Math.Profiles.Control.PIDControl;
 import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.NetworkSubsystem;
 import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.Annotations.AutoNetworkPublisher;
@@ -28,28 +24,30 @@ public class OutakeSub extends NetworkSubsystem{
     private TalonFX wheels;
     private TalonFXConfiguration wheelsConfig;
 
-    private SparkAbsoluteEncoder encoder;
+    private RelativeEncoder relEncoder ;
 
 
     public OutakeSub () {
         super("OutakeSubsystem", false);
 
-        arm = new ForgeSparkMax(OutConstants.arm_ID,"OutakeAngle");
+        arm = new ForgeSparkMax(OutConstants.arm_ID, "OutakeAngle");
         pidUp = new PIDControl(OutConstants.pidGainsUp);
         pidDown = new PIDControl(OutConstants.pidGainsDown);
 
         wheels = new TalonFX(OutConstants.Wheels_ID);
         wheels.setNeutralMode(NeutralModeValue.Brake);
 
+        wheelsConfig = new TalonFXConfiguration();
+
         wheelsConfig.CurrentLimits.SupplyCurrentLimitEnable = false;
         wheelsConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         wheelsConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-        encoder = arm.getAbsoluteEncoder();
+        relEncoder = arm.getEncoder();
 
         arm.flashConfiguration(
             OutConstants.armInveerted, 
-            IdleMode.kCoast, 
+            IdleMode.kBrake, 
             OutConstants.armCurrentLimit, 
             false);
 
@@ -59,40 +57,50 @@ public class OutakeSub extends NetworkSubsystem{
     }
 
     @Override
-    public void NetworkPeriodic(){}
-
-    @AutoNetworkPublisher(key = "ArmPosition")
-    private double getPosition(){ 
-        return encoder.getPosition() * 360; 
+    public void NetworkPeriodic(){
+        SmartDashboard.putNumber("mot", relEncoder.getPosition());
     }
 
-    private void setPosition(double targetPosition) {
+    @AutoNetworkPublisher(key = "ArmPosition")
+    public double getPosition(){ 
+        return (relEncoder.getPosition() / 66.666) * 360;
+    }
+    
+    public void resetEconder(){
+        relEncoder.setPosition(0);
+    }
+
+    public void setPositionUp(double targetPosition) {
 
         double output;
 
-        if (targetPosition > 0){
-            double Up = pidUp.calculate(getPosition(), targetPosition).getOutput();
-            double ff = FeedForwardControl.calculate(OutConstants.FFgains, OutConstants.ffVelocity, OutConstants.ffAceleration).getOutput();
-            output = Up + ff;
-        }else{
-            double Down = pidDown.calculate(getPosition(), targetPosition).getOutput();
-            output = Down; 
-        }        
+        output = pidUp.calculate(targetPosition, getPosition()).getOutput();
 
-        //output = Math.max(OutConstants.Wrist_MinOutput, Math.min(OutConstants.Wrist_MaxOutput, output));//clamp
-        arm.set(output); 
+        arm.set(output);
+
     }
 
-    private void runArm(double speed){
+    public void setPositionDown(double targetPosition) {
+
+        double output;
+
+        output = pidDown.calculate(targetPosition, getPosition()).getOutput();
+
+        arm.set(output);
+
+    }
+
+
+    public void runArm(double speed){
         arm.set(speed);
     }
 
-    private void runWheelsOutake(double speed){
+    public void runWheelsOutake(double speed){
         wheels.set(speed);
     }
 
     @AutoNetworkPublisher(key = "CurrentSetpoint")
-    private double currentSetpoint(){
+    public double currentSetpoint(){
         return pidUp.getSetpoint()*pidDown.getSetpoint() >= 0 ? pidUp.getSetpoint() : pidDown.getSetpoint();
     }
 
@@ -101,22 +109,22 @@ public class OutakeSub extends NetworkSubsystem{
     }
 
     @AutoNetworkPublisher(key = "AtGoal")
-    private boolean atGoal(){
-        return  (getPosition() - currentSetpoint()) <=  OutConstants.armTolerance;
+    public boolean atGoal(){
+        return pidDown.atSetpoint() || pidUp.atSetpoint();
     }
 
-    private void stopArm(){
+    public void stopArm(){
         arm.stopMotor();
     }
 
-    private void stopwheelsOutake(){
+    public void stopwheelsOutake(){
        wheels.stopMotor();
     }
 
-    private void stopALL(){
+    public void stopALL(){
        wheels.stopMotor();
         arm.stopMotor();
     }
-}*/
+}
     
 

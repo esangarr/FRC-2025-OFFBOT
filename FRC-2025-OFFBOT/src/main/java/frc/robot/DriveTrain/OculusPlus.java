@@ -67,7 +67,6 @@ public class OculusPlus extends NetworkSubsystem{
         this.nav = new QuestNav();
     }
 
-    @AutoNetworkPublisher(key = "BatteryPercent")
     public OptionalInt getBattery(){
         Data.ProtobufQuestNavDeviceData latestDeviceData = deviceDataSubscriber.get();
 

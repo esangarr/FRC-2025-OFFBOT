@@ -1,19 +1,31 @@
 
 package frc.robot.Mechanisms.Elevator;
 
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.RelativeEncoder;
 
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.MecaCommands.ElevatorCommands.ElevatorCommands;
 import frc.robot.Mechanisms.MechanismsConstants.ElevatorConstants;
+import lib.ForgePlus.NetworkTableUtils.NTPublisher;
 import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.NetworkSubsystem;
+import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.Annotations.AutoNetworkPublisher;
 
 public class ElevatorSub extends NetworkSubsystem{
 
-    private final TalonFX leader, follower;
+    private TalonFX leader, follower;
 
-    private final TalonFXConfiguration LeaderConfig, FollowerConfig;
+    private TalonFXConfiguration LeaderConfig, FollowerConfig;
+
+    private Encoder encoder;
+
+
 
 
     public ElevatorSub () {
@@ -21,6 +33,7 @@ public class ElevatorSub extends NetworkSubsystem{
 
         leader = new TalonFX(ElevatorConstants.Leader_ID);
         follower = new TalonFX(ElevatorConstants.Follower_ID);
+
 
         LeaderConfig = new TalonFXConfiguration();
         FollowerConfig = new TalonFXConfiguration();
@@ -39,6 +52,15 @@ public class ElevatorSub extends NetworkSubsystem{
         leader.getConfigurator().apply(LeaderConfig);
         follower.getConfigurator().apply(FollowerConfig);
 
+        encoder = new Encoder(1, 2, false, Encoder.EncodingType.k4X);
+        encoder.setDistancePerPulse(ElevatorConstants.distancePerPulse);
+
+
+    }
+
+
+    public double getDistance(){
+        return encoder.getDistance();
     }
 
     public void runMot(double speed){
@@ -47,7 +69,6 @@ public class ElevatorSub extends NetworkSubsystem{
     }
 
     public void StopMotors (){
-
         leader.stopMotor();
         follower.stopMotor();
     }
@@ -55,6 +76,8 @@ public class ElevatorSub extends NetworkSubsystem{
 
 
     @Override
-    public void NetworkPeriodic() {}
+    public void NetworkPeriodic() {
+       NTPublisher.publish("Distance", getTableKey(), getDistance());
+    }
     
 }
