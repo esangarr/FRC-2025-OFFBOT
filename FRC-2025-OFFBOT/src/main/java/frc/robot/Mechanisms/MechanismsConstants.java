@@ -36,21 +36,21 @@ public class MechanismsConstants {
         public static final int IntAngle_ID = 11;
         public static final int IntWheels_ID = 14;
 
-        public final static boolean AngulatorInverted = false;
+        public final static boolean AngulatorInverted = true;
 
         public final static int AngulatorCurrentLimit = 0;
         public final static int IntWheelsCurrentLimit = 0;
 
-        public final static double pidTolerance = 0;
+        public final static double pidTolerance = 3;
 
         public final static double GaerRatio = 17.9;
 
-        public final static double intakeTolerance = 0;
+        public final static double intakeTolerance = 6;
         
-        public static final PIDGains pidGainsUp = new PIDGains(0.01 , 0, 0);
-        public static final PIDGains pidGainsDown = new PIDGains(0, 0, 0);
+        public static final PIDGains pidGainsUp = new PIDGains(0.006 , 0, 0.0009);
+        public static final PIDGains pidGainsDown = new PIDGains(0.0047, 0, 0.00035);
         public static final CompleteFeedForwardGains FFgains = new CompleteFeedForwardGains(
-            0, 
+            0.006, 
             0, 
             0, 
             0);
@@ -89,7 +89,6 @@ public class MechanismsConstants {
 
         public static final double distancePerPulse = gearCircunference / pulsesPerRevolution; //Distancia recorrida por cada vuelta
 
-        public static final double CONVERSION_FACTOR = (0.247369) / 5;
         public static final double ELEVATOR_OFFSET_CENTIMETERS = 25;
 
 
@@ -98,8 +97,8 @@ public class MechanismsConstants {
 
     public class ClimberConstants {
 
-        public static final int Climber_ID = 13;
-        public static final int ClimbWheel_ID = 18;
+        public static final int Climber_ID = 18;
+        public static final int ClimbWheel_ID = 13;
 
         public static final boolean cimberInverted = false;
     }

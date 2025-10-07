@@ -5,6 +5,8 @@
 package frc.robot;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
+
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -16,9 +18,11 @@ import frc.robot.DriveCommands.DriveCommands;
 import frc.robot.DriveTrain.Swerve;
 import frc.robot.DriveTrain.Swerve.SwervePathConstraints;
 import frc.robot.DriveTrain.Vision;
+import frc.robot.MecaCommands.ClimberCommands.ClimberCommands;
 import frc.robot.MecaCommands.ElevatorCommands.ElevatorCommands;
 import frc.robot.MecaCommands.IntakeCommands.IntakeCommands;
 import frc.robot.MecaCommands.OutakeCommands.OutakeCommands;
+import frc.robot.Mechanisms.Climber.ClimberSub;
 import frc.robot.Mechanisms.Elevator.ElevatorSub;
 import frc.robot.Mechanisms.Indexer.IndexerSub;
 import frc.robot.Mechanisms.Intake.IntakeSub;
@@ -36,6 +40,8 @@ public class RobotContainer {
   private final IndexerSub index;
   private ElevatorSub elevator;
   private final OutakeSub outake;
+  private final ClimberSub climber;
+  private final Debouncer timerOut = new Debouncer(0.45);
 
 
   private final Smoothjoystick smooth = new Smoothjoystick(1.1);
@@ -62,6 +68,7 @@ public class RobotContainer {
     elevator = new ElevatorSub();
     index = new IndexerSub();
     outake = new OutakeSub();
+    climber = new ClimberSub();
 
     NTPublisher.publish("Joysticks", "Driver1", driver);
   
@@ -107,21 +114,19 @@ public class RobotContainer {
 
   
     operator.leftStick().whileTrue(IntakeCommands.runIntakeManual(intake, ()-> operator.getLeftY() * 0.6));
-    operator.rightStick().whileTrue(OutakeCommands.armManual(outake,()-> operator.getRightY()*0.1));
+    operator.rightStick().whileTrue(ElevatorCommands.runManual(elevator, ()-> operator.getRightY()*0.15));
 
-    operator.a().whileTrue(IntakeCommands.clearPiece(intake, index, 0.9, 0.5, 0.5));
-    operator.b().whileTrue(IntakeCommands.outPiece(intake, index, 0.9, 2, 0.7));
-    
-    operator.rightBumper().whileTrue(OutakeCommands.setAngleUp(outake, 120));
-    operator.leftBumper().whileTrue(OutakeCommands.setAngleDown(outake, 0));  
+    operator.b().whileTrue(IntakeCommands.setAngleUp(intake, 0));
+    operator.x().whileTrue(IntakeCommands.setAngleDown(intake,180));
+    operator.y().whileTrue(IntakeCommands.outPiece(intake, index, 0.9, 0, 0.5 ));
+
+    operator.rightBumper().whileTrue(IntakeCommands.clearPiece(intake, index, 0.7, 0.5, 0.5, timerOut));
 
     operator.leftTrigger().whileTrue(OutakeCommands.outWheels(outake, 0.6)); //Tragar
     operator.rightTrigger().whileTrue(OutakeCommands.outWheels(outake, -0.2)); //Disparar
 
-    operator.y().whileTrue(ElevatorCommands.MoveMotors(elevator, 0.1));
-    operator.a().whileTrue(ElevatorCommands.MoveMotors(elevator, -0.3));
-
     operator.povDown().whileTrue(OutakeCommands.resetEncoder(outake));
+
     
     
 

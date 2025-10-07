@@ -39,7 +39,7 @@ public class ElevatorSub extends NetworkSubsystem{
         FollowerConfig = new TalonFXConfiguration();
 
         leader.setNeutralMode(NeutralModeValue.Brake);
-        follower.setNeutralMode(NeutralModeValue.Brake);
+        follower.setNeutralMode(NeutralModeValue.Brake );
 
         LeaderConfig.CurrentLimits.SupplyCurrentLimitEnable = false;
         LeaderConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -52,15 +52,18 @@ public class ElevatorSub extends NetworkSubsystem{
         leader.getConfigurator().apply(LeaderConfig);
         follower.getConfigurator().apply(FollowerConfig);
 
-        encoder = new Encoder(1, 2, false, Encoder.EncodingType.k4X);
-        encoder.setDistancePerPulse(ElevatorConstants.distancePerPulse);
+        encoder = new Encoder(1, 2, true, Encoder.EncodingType.k4X);
+        //encoder.setDistancePerPulse(ElevatorConstants.distancePerPulse);
 
 
     }
 
+    public double Ticks(){
+        return encoder.getDistancePerPulse();
+    }
 
-    public double getDistance(){
-        return encoder.getDistance();
+    public double getDistanceCm(){
+        return ((124.5/17440) * encoder.getDistance()) + 63.5 ;
     }
 
     public void runMot(double speed){
@@ -77,7 +80,9 @@ public class ElevatorSub extends NetworkSubsystem{
 
     @Override
     public void NetworkPeriodic() {
-       NTPublisher.publish("Distance", getTableKey(), getDistance());
+       NTPublisher.publish("Distance", getTableKey(), getDistanceCm());
+       NTPublisher.publish("Ticks", getTableKey(), encoder.getDistancePerPulse());
+    }
     }
     
-}
+

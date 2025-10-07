@@ -16,31 +16,34 @@ import lib.ForgePlus.REV.SparkMax.ForgeSparkMax;
 
 public class ClimberSub extends NetworkSubsystem{
 
-    private ForgeSparkMax climber; 
+    private ForgeSparkMax climberWheels;
 
-    private TalonFX climbWheels;
-    private TalonFXConfiguration climbWheelsConfig;
+    private TalonFX climber;
+    private TalonFXConfiguration climbConfig;
     
 
     public ClimberSub () {
         super("ClimberSubsystem", false);
 
-        climber = new ForgeSparkMax(ClimberConstants.Climber_ID, MotorType.kBrushless, "MotorClimb");
+        climberWheels = new ForgeSparkMax(ClimberConstants.ClimbWheel_ID
+        
+        , MotorType.kBrushless, "MotorClimb");
 
-        climber.flashConfiguration(
+        climberWheels.flashConfiguration(
             ClimberConstants.cimberInverted, 
             IdleMode.kBrake, 
             0, 
             false);
 
-        climbWheels = new TalonFX(ClimberConstants.ClimbWheel_ID);
-        climbWheels.setNeutralMode(NeutralModeValue.Brake);
 
-        climbWheelsConfig = new TalonFXConfiguration();
+        climber = new TalonFX(ClimberConstants.Climber_ID);
+        climber.setNeutralMode(NeutralModeValue.Brake);
 
-        climbWheelsConfig.CurrentLimits.SupplyCurrentLimitEnable = false;
-        climbWheelsConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        climbWheelsConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        climbConfig = new TalonFXConfiguration();
+
+        climbConfig.CurrentLimits.SupplyCurrentLimitEnable = false;
+        climbConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        climbConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
 
     }
@@ -53,7 +56,7 @@ public class ClimberSub extends NetworkSubsystem{
     }
 
     public void runWheels(double speed){
-        climbWheels.set(speed);
+        climberWheels.set(speed);
     }
 
     public void StopAng(){
@@ -61,12 +64,12 @@ public class ClimberSub extends NetworkSubsystem{
     }
 
     public void StopWheels(){
-        climbWheels.stopMotor();
+        climberWheels.stopMotor();
     }
 
     public void StopAll(){
         climber.stopMotor();
-        climbWheels.stopMotor();
+        climberWheels.stopMotor();
     }
     
 }

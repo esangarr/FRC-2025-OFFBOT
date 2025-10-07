@@ -3,11 +3,14 @@ package frc.robot.Mechanisms.Indexer;
 import java.util.function.BooleanSupplier;
 
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Mechanisms.MechanismsConstants.IndexerConstants;
 import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.Annotations.AutoNetworkPublisher;
 import lib.ForgePlus.REV.SparkMax.ForgeSparkMax;
+import lib.ForgePlus.NetworkTableUtils.NTPublisher;
 import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.NetworkSubsystem;
 
 public class IndexerSub extends NetworkSubsystem{
@@ -15,6 +18,8 @@ public class IndexerSub extends NetworkSubsystem{
     private final ForgeSparkMax leftMot, rightMot;
 
     private final DigitalInput BeamSensor;
+
+    private final Debouncer timer;
 
     //:v
     public IndexerSub (){
@@ -24,6 +29,8 @@ public class IndexerSub extends NetworkSubsystem{
 
         leftMot = new ForgeSparkMax(IndexerConstants.LeftWheels_ID, "IndexerLeftWheels");
         rightMot = new ForgeSparkMax(IndexerConstants.RightWheels_ID, "IndexerRightWheels");
+
+        timer = new Debouncer(0.45);
 
         leftMot.flashConfiguration(
             IndexerConstants.LeftInverted,
@@ -41,62 +48,56 @@ public class IndexerSub extends NetworkSubsystem{
 
     @Override
     public void NetworkPeriodic(){
-        SmartDashboard.putNumber("Vright", getVoltageRight());
-        SmartDashboard.putNumber("Vleft", getVoltageLeft());
+        NTPublisher.publish("CurrentRight", getTableKey(), getCurrentRight());
+        NTPublisher.publish("CurrentLeft", getTableKey(), getCurrentLeft());
+        NTPublisher.publish("One Stuck", getTableKey(), isStuck());
+        NTPublisher.publish("Both stuck", getTableKey(), BothStuck());
+        NTPublisher.publish("Is Clear", getTableKey(), isClear());
+        NTPublisher.publish("Has Piece", getTableKey(), hasPiece());
      }
 
     public void runWheels(double speedRight, double speedLeft){
         leftMot.set(speedLeft);
         rightMot.set(speedRight);
     }
-
-    @AutoNetworkPublisher(key = "VoltageLeft")
-    public double getVoltageLeft(){
-        return leftMot.getBusVoltage();
-    }
-
-    @AutoNetworkPublisher(key = "VoltageRight")
-    public double getVoltageRight(){
-        
-        return rightMot.getBusVoltage();
-        
-    }
-
-    @AutoNetworkPublisher(key = "CurrentLeft")
+ 
     public double getCurrentLeft(){
         return leftMot.getOutputCurrent();
     }
 
-    @AutoNetworkPublisher(key = "CurrentRight")
+  
     public double getCurrentRight(){
         
         return rightMot.getOutputCurrent();
         
     }
 
-    @AutoNetworkPublisher(key = "hasPiece")
     public boolean hasPiece(){
         return BeamSensor.get();
+    }
+
+    public double rightSpin(){
+        return rightMot.get();
+    }
+
+    public double leftSpin(){
+        return leftMot.get();
     }
 
     public boolean isWheelSpinning(){
         return rightMot.get() != 0 && leftMot.get() != 0;
     }
 
-    @AutoNetworkPublisher(key = "One Stuck")
     public Boolean isStuck(){
-        return getVoltageRight() <= 7.7 || getVoltageLeft()<= 7.7;
+        return timer.calculate(getCurrentRight() >= 27 || getCurrentLeft() >= 27);
     }
 
-    @AutoNetworkPublisher(key = "BOTH Stuck")
     public Boolean BothStuck(){
-        return getVoltageRight() <= 7.7 || getVoltageLeft()<= 7.7;
+        return timer.calculate(getCurrentRight() >= 27 && getCurrentLeft() >= 27);
     }
 
-
-    @AutoNetworkPublisher(key = "Clear")
     public Boolean isClear(){
-        return getVoltageRight() > 7.7 || getVoltageLeft() > 7.7;
+        return getCurrentRight() < 27 && getCurrentLeft() < 27;
     }
 
     public void stop(){

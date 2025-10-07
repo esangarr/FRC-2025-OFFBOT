@@ -2,6 +2,7 @@ package frc.robot.Mechanisms.Intake;
 
 import lib.ForgePlus.Math.Profiles.Control.FeedForwardControl;
 import lib.ForgePlus.Math.Profiles.Control.PIDControl;
+import lib.ForgePlus.NetworkTableUtils.NTPublisher;
 import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.NetworkSubsystem;
 import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.Annotations.AutoNetworkPublisher;
 import lib.ForgePlus.REV.SparkMax.ForgeSparkMax;
@@ -28,6 +29,8 @@ public class IntakeSub extends NetworkSubsystem{
     private PIDControl pidUp;
     private PIDControl pidDown;
 
+    private FeedForwardControl ff;
+
     private TalonFX wheels;
     private TalonFXConfiguration IntConfigs;
 
@@ -43,6 +46,7 @@ public class IntakeSub extends NetworkSubsystem{
         pidUp = new PIDControl(IntakeConstants.pidGainsUp);
         pidDown = new PIDControl(IntakeConstants.pidGainsDown);
 
+        ff = new FeedForwardControl();
 
 
         //Config Motor Angulador
@@ -68,14 +72,14 @@ public class IntakeSub extends NetworkSubsystem{
 
     @Override
     public void NetworkPeriodic(){
-        SmartDashboard.putNumber("Encoder", encoder.getPosition());
-        SmartDashboard.putNumber("Angulo", getPositionAng());
+        NTPublisher.publish("Encoder", getTableKey(), encoder.getPosition());
+        NTPublisher.publish("Angulo", getTableKey(), getPositionAng());
+        NTPublisher.publish("CurrentSetpoint", getTableKey(), currentSetpoint());
+        NTPublisher.publish("Atgoal", getTableKey(), atGoal());
         
 
-     }
+    }
 
-
-    @AutoNetworkPublisher(key = "AngPosition")
     private double getPositionAng(){ 
         return (encoder.getPosition()  * 360); 
 
@@ -86,7 +90,10 @@ public class IntakeSub extends NetworkSubsystem{
 
         double output;
 
-        output = pidUp.calculate(targetPosition, getPositionAng()).getOutput();
+        double pid = pidUp.calculate(targetPosition, getPositionAng()).getOutput();
+        double feedForward = ff.calculate(IntakeConstants.FFgains, 0 , 0).getOutput();
+
+        output = pid + feedForward;
 
         motorAng.set(output);
 
@@ -107,12 +114,10 @@ public class IntakeSub extends NetworkSubsystem{
     }
 
     
-    @AutoNetworkPublisher(key = "CurrentSetpoint")
     public double currentSetpoint(){
         return pidUp.getSetpoint()*pidDown.getSetpoint() >= 0 ? pidUp.getSetpoint() : pidDown.getSetpoint();
     }
 
-    @AutoNetworkPublisher(key = "AtGoal")
     public boolean atGoal(){
         return  (getPositionAng() - currentSetpoint()) <=  IntakeConstants.intakeTolerance;
     }

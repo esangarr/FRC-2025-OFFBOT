@@ -2,6 +2,7 @@ package frc.robot.MecaCommands.IntakeCommands;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -14,6 +15,11 @@ public class IntakeCommands {
     public static Command setAngleUp(IntakeSub intake, double angle){
 
         return Commands.run(()-> {intake.setPositionUp(angle);},intake).finallyDo(()->{intake.stopAng();});
+    }
+
+    public static Command setAngleDown(IntakeSub intake, double angle){
+
+        return Commands.run(()-> {intake.setPositionDown(angle);},intake);
     }
 
     public static Command runIntakeManual(IntakeSub intake, DoubleSupplier joystick){
@@ -33,7 +39,8 @@ public class IntakeCommands {
         IndexerSub index, 
         double intakeSpeed,
         double rightSpeed,
-        double leftSpeed
+        double leftSpeed, 
+        Debouncer timer
         ){ 
 
             return Commands.run(() -> {
@@ -41,20 +48,27 @@ public class IntakeCommands {
                 index.runWheels(rightSpeed, leftSpeed);
             }, intake, index)
 
-            .until(() -> index.getVoltageRight() <= 7.6 || index.getVoltageLeft() <= 7.6)
+            .until(() -> timer.calculate(index.getCurrentRight() > 27 || index.getCurrentLeft() > 27))
             
             .andThen(Commands.run(() -> {
 
+                if (index.getCurrentRight() >= 27){
                     intake.runWheelsIntake(-intakeSpeed/2);
-                    index.runWheels(-rightSpeed, -leftSpeed);
+                    index.runWheels(-rightSpeed, leftSpeed);}
 
-                }, intake, index).withTimeout(1).
-                
+                if (index.getCurrentLeft() >= 27){
+                    intake.runWheelsIntake(-intakeSpeed/2);
+                    index.runWheels(rightSpeed, -leftSpeed);}
+
+                }, intake, index).withTimeout(0.35).
+
                 andThen(
                 Commands.run(() -> {
                     intake.runWheelsIntake(intakeSpeed);
                     index.runWheels(rightSpeed, leftSpeed);
-                }, intake, index)));
+                }, intake, index))).finallyDo(()->{
+                    intake.stopAll(); 
+                    index.stop();});
         }
 
     public static Command outPiece(
@@ -65,73 +79,11 @@ public class IntakeCommands {
         double indexSpeed){
             return Commands.run(()->{
                 intake.setPositionUp(angleUp);
+            }, intake, index).until(()-> intake.atGoal()).
+            andThen(Commands.run(()-> {
                 intake.runWheelsIntake(-intakeSpeed);
-                index.runWheels(-indexSpeed, -indexSpeed);
-            }, intake, index).finallyDo(()->{index.stop();});
+                index.runWheels(-indexSpeed, -indexSpeed);}))
+                .finallyDo(()->{index.stop(); intake.stopAll();});
         }
-    
-    public static Command intakePiece(
-        IntakeSub intake,
-        IndexerSub index,   
-        double wheelsIntake,
-        double rightSpeed,
-        double leftSpeed){
-
-            return Commands.run(()->{
-                intake.runWheelsIntake(wheelsIntake);
-                index.runWheels(rightSpeed, leftSpeed);
-
-          },intake, index).finallyDo(()-> {
-
-            intake.stopAll();
-            index.stop();});
-    }
-
-    public static Command eatPieceNoBeam(
-        IntakeSub intake,
-        IndexerSub index,
-        double angle,
-        double wheelsIntake,
-        double rightSpeed,
-        double leftSpeed){
-
-            return Commands.run(()->{
-                intake.setPositionDown(angle);
-                intake.runWheelsIntake(wheelsIntake);
-                index.runWheels(rightSpeed, leftSpeed);
-
-          },intake, index).finallyDo(()-> {
-
-            intake.stopAll();
-            index.stop();});
-    }
-
-    public static Command eatPiece(
-        IntakeSub intake,
-        IndexerSub index,
-        double eatAngle,
-        double retractAngle,
-        double wheelsIntake,
-        double rightSpeed,
-        double leftSpeed ){
-
-            return Commands.run(()->{
-                intake.setPositionDown(eatAngle);
-
-              if (index.hasPiece() == false){
-                    intake.runWheelsIntake(wheelsIntake);
-                  index.runWheels(rightSpeed, leftSpeed);
-                }else{
-                    intake.stopWheelsIntake();
-                    index.stop();
-                    intake.setPositionUp(retractAngle);
-                }
-
-            }, intake, index).finallyDo(()->{intake.stopAll(); index.stop();});
-    }
-
-
-
-
 
 }
