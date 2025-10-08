@@ -2,20 +2,20 @@
 package frc.robot.Mechanisms.Elevator;
 
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.ExternalFeedbackConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
+import com.ctre.phoenix6.controls.StrictFollower;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.revrobotics.RelativeEncoder;
 
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.MecaCommands.ElevatorCommands.ElevatorCommands;
 import frc.robot.Mechanisms.MechanismsConstants.ElevatorConstants;
-import lib.ForgePlus.NetworkTableUtils.NTPublisher;
+
 import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.NetworkSubsystem;
-import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.Annotations.AutoNetworkPublisher;
 
 public class ElevatorSub extends NetworkSubsystem{
 
@@ -25,7 +25,11 @@ public class ElevatorSub extends NetworkSubsystem{
 
     private Encoder encoder;
 
+    private  MotionMagicExpoVoltage leader_request;
 
+
+    private double rotorPosLatency;
+    private double rotorPosRotations;
 
 
     public ElevatorSub () {
@@ -34,6 +38,9 @@ public class ElevatorSub extends NetworkSubsystem{
         leader = new TalonFX(ElevatorConstants.Leader_ID);
         follower = new TalonFX(ElevatorConstants.Follower_ID);
 
+        leader.getPosition().getValueAsDouble();
+
+        leader_request = new MotionMagicExpoVoltage(0);
 
         LeaderConfig = new TalonFXConfiguration();
         FollowerConfig = new TalonFXConfiguration();
@@ -43,24 +50,92 @@ public class ElevatorSub extends NetworkSubsystem{
 
         LeaderConfig.CurrentLimits.SupplyCurrentLimitEnable = false;
         LeaderConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        LeaderConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        LeaderConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
         FollowerConfig.CurrentLimits.SupplyCurrentLimitEnable = false;
         FollowerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         FollowerConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
+        follower.setControl(new Follower(leader.getDeviceID(), true));
+
         leader.getConfigurator().apply(LeaderConfig);
         follower.getConfigurator().apply(FollowerConfig);
 
+       
         encoder = new Encoder(1, 2, true, Encoder.EncodingType.k4X);
-        //encoder.setDistancePerPulse(ElevatorConstants.distancePerPulse);
 
+        configMotion();
 
     }
 
-    public double Ticks(){
-        return encoder.getDistancePerPulse();
+    public void updatePosition(){
+        // acquire a refreshed TalonFX rotor position signal
+        var rotorPosSignal = leader.getRotorPosition();
+
+        rotorPosRotations = rotorPosSignal.getValueAsDouble();
+
+        rotorPosLatency = rotorPosSignal.getTimestamp().getLatency();
+
+        rotorPosSignal.waitForUpdate(0.020);
     }
+
+    public void configMotion(){
+        var talonFXConfigs = new TalonFXConfiguration();
+        var slot0Configs = talonFXConfigs.Slot0;
+
+        slot0Configs.kS = 0.30; // Add 0.25 V output to overcome static friction
+        slot0Configs.kV = 0.1428; // A velocity target of 1 rps results in 0.12 V output
+        slot0Configs.kA = 0.014; // An acceleration of 1 rps/s requires 0.01 V output
+        slot0Configs.kP = 0.1; // A position error of 2.5 rotations results in 12 V output
+        slot0Configs.kI = 0; // no output for integrated error
+        slot0Configs.kD = 0.001 ; // A velocity error of 1 rps results in 0.1 V output
+    
+        var motionMagicConfigs = talonFXConfigs.MotionMagic;
+        motionMagicConfigs.MotionMagicCruiseVelocity = 42; // Unlimited cruise velocity
+        motionMagicConfigs.MotionMagicAcceleration = 84;
+
+
+        leader.getConfigurator().apply(talonFXConfigs);
+        follower.getConfigurator().apply(talonFXConfigs);
+
+        
+    }
+
+    public enum RequestType{
+        kUP, kDown
+    }
+
+    public void setPosition(double position, RequestType type){
+
+        if(type == RequestType.kUP){
+            var request = leader_request.withPosition(position).withSlot(0);
+            leader.setControl(leader_request.withPosition(position).withSlot(0));
+        }else{
+            leader.setControl(leader_request.withPosition(position).withSlot(1));
+        }
+
+        
+
+    }
+
+    public double getMeters(){
+        double gamma = ((124.5/42));
+        return gamma * -rotorPosRotations + 63.5;
+    }
+
+    public double metersToRot(double meters){
+        double gamma = ((124.5/42));
+        double omega = 63.5;
+
+        double convertion = (meters - omega) / gamma;
+
+        return convertion;
+    }
+
+    public void setVoltage(double voltage){
+        leader.setVoltage(voltage);
+    }
+
 
     public double getDistanceCm(){
         return ((124.5/17440) * encoder.getDistance()) + 63.5 ;
@@ -68,20 +143,22 @@ public class ElevatorSub extends NetworkSubsystem{
 
     public void runMot(double speed){
         leader.set(speed);
-        follower.set(speed);
     }
 
     public void StopMotors (){
         leader.stopMotor();
-        follower.stopMotor();
     }
-
-
 
     @Override
     public void NetworkPeriodic() {
-       NTPublisher.publish("Distance", getTableKey(), getDistanceCm());
-       NTPublisher.publish("Ticks", getTableKey(), encoder.getDistancePerPulse());
+        updatePosition();
+
+       publishOutput("Rotor/Rotations", rotorPosRotations);
+       publishOutput("Rotor/Latency", rotorPosLatency);
+       publishOutput("metros", getMeters());
+       publishOutput("Rotor/inverse", metersToRot(getMeters()));
+
+
     }
     }
     

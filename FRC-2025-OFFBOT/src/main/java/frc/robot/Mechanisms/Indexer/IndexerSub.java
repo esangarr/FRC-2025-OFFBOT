@@ -1,14 +1,10 @@
 package frc.robot.Mechanisms.Indexer;
 
-import java.util.function.BooleanSupplier;
-
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Mechanisms.MechanismsConstants.IndexerConstants;
-import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.Annotations.AutoNetworkPublisher;
 import lib.ForgePlus.REV.SparkMax.ForgeSparkMax;
 import lib.ForgePlus.NetworkTableUtils.NTPublisher;
 import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.NetworkSubsystem;

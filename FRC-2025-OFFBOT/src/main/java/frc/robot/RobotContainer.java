@@ -29,6 +29,7 @@ import frc.robot.Mechanisms.Intake.IntakeSub;
 import frc.robot.Mechanisms.Outake.OutakeSub;
 import lib.ForgePlus.NetworkTableUtils.NTPublisher;
 import lib.ForgePlus.NetworkTableUtils.NTSendableChooser;
+import lib.ForgePlus.NetworkTableUtils.NTTunnableNumber;
 import lib.ForgePlus.SwerveLib.Utils.Smoothjoystick;
 
 public class RobotContainer {
@@ -112,15 +113,22 @@ public class RobotContainer {
 
     //---------------------------------------------------------------- OPERATOR ----------------------------------------------------------------
 
+    NTTunnableNumber num = new NTTunnableNumber("Tunnables/kS", 0);
   
     operator.leftStick().whileTrue(IntakeCommands.runIntakeManual(intake, ()-> operator.getLeftY() * 0.6));
     operator.rightStick().whileTrue(ElevatorCommands.runManual(elevator, ()-> operator.getRightY()*0.15));
 
-    operator.b().whileTrue(IntakeCommands.setAngleUp(intake, 0));
-    operator.x().whileTrue(IntakeCommands.setAngleDown(intake,180));
-    operator.y().whileTrue(IntakeCommands.outPiece(intake, index, 0.9, 0, 0.5 ));
+    //operator.b().whileTrue(IntakeCommands.setAngleUp(intake, 30));
+    //operator.x().whileTrue(IntakeCommands.setAngleDown(intake,210));
+    operator.y().whileTrue(IntakeCommands.outPiece(intake, index, 0.9, 30, 0.5 ));
 
-    operator.rightBumper().whileTrue(IntakeCommands.clearPiece(intake, index, 0.7, 0.5, 0.5, timerOut));
+    operator.x().whileTrue(ElevatorCommands.setPos(elevator, 10));
+    operator.a().whileTrue(ElevatorCommands.setPos(elevator, 38));
+
+    operator.y().whileTrue(IntakeCommands.clearPiece(intake, index, 0.7, 0.5, 0.5, timerOut));
+
+    operator.rightBumper().whileTrue(OutakeCommands.setAngleUp(outake, 130));
+    operator.leftBumper().whileTrue(OutakeCommands.setAngleDown(outake, 0));
 
     operator.leftTrigger().whileTrue(OutakeCommands.outWheels(outake, 0.6)); //Tragar
     operator.rightTrigger().whileTrue(OutakeCommands.outWheels(outake, -0.2)); //Disparar
