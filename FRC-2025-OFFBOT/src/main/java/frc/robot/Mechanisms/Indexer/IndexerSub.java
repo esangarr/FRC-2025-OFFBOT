@@ -44,11 +44,6 @@ public class IndexerSub extends NetworkSubsystem{
 
     @Override
     public void NetworkPeriodic(){
-        NTPublisher.publish("CurrentRight", getTableKey(), getCurrentRight());
-        NTPublisher.publish("CurrentLeft", getTableKey(), getCurrentLeft());
-        NTPublisher.publish("One Stuck", getTableKey(), isStuck());
-        NTPublisher.publish("Both stuck", getTableKey(), BothStuck());
-        NTPublisher.publish("Is Clear", getTableKey(), isClear());
         NTPublisher.publish("Has Piece", getTableKey(), hasPiece());
      }
 

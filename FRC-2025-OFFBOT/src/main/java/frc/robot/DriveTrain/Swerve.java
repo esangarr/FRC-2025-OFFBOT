@@ -165,12 +165,7 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
             ()-> getRotation().getRadians()
         );
 
-        dashboardField = new ElasticField(
-            getTableKey(), "Elastic/Field", this::getEstimatedPosition);
-
         publishOutput("PoseFinder", pathFinder);
-
-        publishOutput("IsInSim", isInSimulation());
 
     }
 
@@ -240,8 +235,6 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
             for (var module : modules) {
               module.stopModule();
         }}
-
-        publishOutput("Odometry/NormalPose", estimator.getEstimatedPosition());
 
         SwerveModulePosition[] modulePositions = getModulePositions();
         SwerveModulePosition[] moduleDeltas = new SwerveModulePosition[4];
@@ -347,7 +340,6 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
           }
     }
 
-    @NetworkCommand("Commands/HomeModules")
     public Command homeModulesCommand(){
         return Commands.runOnce(()-> homeModules(), this);
     }
@@ -370,7 +362,6 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
         );
     }
 
-    @AutoNetworkPublisher(key = "Speeds/ModuleStates")
     public SwerveModuleState[] getModuleStates() {
         SwerveModuleState[] states = new SwerveModuleState[4];
         for (int i = 0; i < 4; i++) {
@@ -379,7 +370,6 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
         return states;
     }
 
-    @AutoNetworkPublisher(key = "ModulePositions")
     public SwerveModulePosition[] getModulePositions() {
         SwerveModulePosition[] states = new SwerveModulePosition[4];
         for (int i = 0; i < 4; i++) {
@@ -388,7 +378,6 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
         return states;
     }
 
-    @AutoNetworkPublisher(key = "ChassisSpeeds")
     public ChassisSpeeds getChassisSpeeds(){
       return kinematics.toChassisSpeeds(getModuleStates());
     } 
@@ -400,12 +389,10 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
         
     }
 
-    @AutoNetworkPublisher(key = "Odometry/BotPose2D")
     public Pose2d getEstimatedPosition() {
         return estimator.getEstimatedPosition();
     }
-
-    @AutoNetworkPublisher(key = "Odometry/BotHeading")    
+    
     public Rotation2d getRotation(){
         return getEstimatedPosition().getRotation();
     }
@@ -414,12 +401,10 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
         return pathFinder;
     }
 
-    @AutoNetworkPublisher(key = "Speeds/MaxLinear") 
     public double getMaxLinearSpeedMetersPerSec() {
         return SwerveConstants.MAX_LINEAR_SPEED;
     }
-
-    @AutoNetworkPublisher(key = "Speeds/MaxAngular")      
+    
     public double getMaxAngularSpeedRadPerSec() {
         return SwerveConstants.MAX_ANGULAR_SPEED;
     }

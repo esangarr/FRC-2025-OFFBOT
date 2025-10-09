@@ -39,18 +39,22 @@ public class MechanismsConstants {
         public final static boolean AngulatorInverted = true;
 
         public final static int AngulatorCurrentLimit = 0;
-        public final static int IntWheelsCurrentLimit = 0;
+        public final static int IntWheelsCurrentLimit = 25;
 
         public final static double pidTolerance = 3;
 
         public final static double GaerRatio = 17.9;
 
-        public final static double intakeTolerance = 6;
+        public final static double intakeTolerance = 1.5;
         
-        public static final PIDGains pidGainsUp = new PIDGains(0.0028 , 0, 0.);
-        public static final PIDGains pidGainsDown = new PIDGains(0.0047, 0, 0.00035);
+        public static final PIDGains pidGainsUp = new PIDGains(0.00483 , 0, 0.0001);
+
+
+        public static final PIDGains pidGainsDown = new PIDGains(0.0065, 0, 0.00037);
+
+
         public static final CompleteFeedForwardGains FFgains = new CompleteFeedForwardGains(
-            0.0097, 
+            0.7, 
             0, 
             0, 
             0);

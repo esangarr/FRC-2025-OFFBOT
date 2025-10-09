@@ -71,8 +71,6 @@ public class RobotContainer {
     outake = new OutakeSub();
     climber = new ClimberSub();
 
-    NTPublisher.publish("Joysticks", "Driver1", driver);
-  
     lateral = new PathPlannerAuto("lat");
     mover = new PathPlannerAuto("mover");
     inicio = new PathPlannerAuto("inicio");
@@ -113,23 +111,26 @@ public class RobotContainer {
 
     //---------------------------------------------------------------- OPERATOR ----------------------------------------------------------------
   
-    operator.leftStick().whileTrue(IntakeCommands.runIntakeManual(intake, ()-> operator.getLeftY() * 0.6));
     operator.rightStick().whileTrue(ElevatorCommands.runManual(elevator, ()-> operator.getRightY()*0.15));
 
-    operator.y().whileTrue(IntakeCommands.outPiece(intake, index, 0.9, 30, 0.5 ));
+    operator.a().whileTrue(ElevatorCommands.setPosUp(elevator, outake, elevator.metersToRot(73.5), 70));
+    operator.x().whileTrue(ElevatorCommands.setPosUp(elevator, outake, elevator.metersToRot(71.12), 120));
+    operator.b().whileTrue(ElevatorCommands.setPosUp(elevator, outake, elevator.metersToRot(111.76), 120));
+    operator.y().whileTrue(ElevatorCommands.setPosUp(elevator, outake, elevator.metersToRot(187), 100));
 
-    //operator.x().whileTrue(ElevatorCommands.setPos(elevator, 10));
-    //operator.a().whileTrue(ElevatorCommands.setPos(elevator, 38)); //El setpoint esta en rotaciones
+    operator.povDown().whileTrue(ElevatorCommands.setPosDown(elevator, outake, elevator.metersToRot(80), 3));
 
-    operator.y().whileTrue(IntakeCommands.clearPiece(intake, index, 0.7, 0.5, 0.5, timerOut));
+    operator.leftBumper().whileTrue(IntakeCommands.outPiece(intake, index, 0.9, 35, 0.5 ));
+    operator.rightBumper().whileTrue(IntakeCommands.clearPiece(intake, index, elevator, outake, 0.9, 0.25, 0.25 , timerOut, 35, 200));
+    
 
-    operator.rightBumper().whileTrue(IntakeCommands.setAngleUp(intake, 40));
-    operator.leftBumper().whileTrue(IntakeCommands.setAngleDown(intake, 150));
+    operator.povRight().toggleOnTrue(IntakeCommands.setAngleUp(intake, 35)); // Cambiar a Driver
+    operator.povLeft().whileTrue(IntakeCommands.setAngleDown(intake, 200)); // Cambiar a Driver
 
     operator.leftTrigger().whileTrue(OutakeCommands.outWheels(outake, 0.6)); //Tragar
     operator.rightTrigger().whileTrue(OutakeCommands.outWheels(outake, -0.2)); //Disparar
 
-    operator.povDown().whileTrue(OutakeCommands.resetEncoder(outake));
+    operator.start().whileTrue(OutakeCommands.resetEncoder(outake));
 
     
     

@@ -2,6 +2,7 @@
 package frc.robot.Mechanisms.Elevator;
 
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.ExternalFeedbackConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
@@ -45,21 +46,27 @@ public class ElevatorSub extends NetworkSubsystem{
         LeaderConfig = new TalonFXConfiguration();
         FollowerConfig = new TalonFXConfiguration();
 
+        var limitConfigs = new CurrentLimitsConfigs();
+        limitConfigs.StatorCurrentLimit = 80;
+        limitConfigs.StatorCurrentLimitEnable = true;
+
         leader.setNeutralMode(NeutralModeValue.Brake);
         follower.setNeutralMode(NeutralModeValue.Brake );
 
-        LeaderConfig.CurrentLimits.SupplyCurrentLimitEnable = false;
         LeaderConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         LeaderConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        
 
-        FollowerConfig.CurrentLimits.SupplyCurrentLimitEnable = false;
         FollowerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         FollowerConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
         follower.setControl(new Follower(leader.getDeviceID(), true));
 
         leader.getConfigurator().apply(LeaderConfig);
+        leader.getConfigurator().apply(limitConfigs);
+
         follower.getConfigurator().apply(FollowerConfig);
+        follower.getConfigurator().apply(limitConfigs);
 
        
         encoder = new Encoder(1, 2, true, Encoder.EncodingType.k4X);
@@ -86,13 +93,23 @@ public class ElevatorSub extends NetworkSubsystem{
         slot0Configs.kS = 0.30; // Add 0.25 V output to overcome static friction
         slot0Configs.kV = 0.1428; // A velocity target of 1 rps results in 0.12 V output
         slot0Configs.kA = 0.014; // An acceleration of 1 rps/s requires 0.01 V output
-        slot0Configs.kP = 0.1; // A position error of 2.5 rotations results in 12 V output
+        slot0Configs.kP = 0.07; // A position error of 2.5 rotations results in 12 V output
         slot0Configs.kI = 0; // no output for integrated error
         slot0Configs.kD = 0.001 ; // A velocity error of 1 rps results in 0.1 V output
     
         var motionMagicConfigs = talonFXConfigs.MotionMagic;
         motionMagicConfigs.MotionMagicCruiseVelocity = 42; // Unlimited cruise velocity
         motionMagicConfigs.MotionMagicAcceleration = 84;
+
+        var slot1Configs = talonFXConfigs.Slot1;
+
+        slot1Configs.kS = 0.20; // Add 0.25 V output to overcome static friction
+        slot1Configs.kV = 0.127; // A velocity target of 1 rps results in 0.12 V output
+        slot1Configs.kA = 0.014; // An acceleration of 1 rps/s requires 0.01 V output
+        slot1Configs.kP = 0.07; // A position error of 2.5 rotations results in 12 V output
+        slot1Configs.kI = 0; // no output for integrated error
+        slot1Configs.kD = 0.001 ; // A velocity error of 1 rps results in 0.1 V output
+    
 
 
         leader.getConfigurator().apply(talonFXConfigs);
@@ -108,7 +125,6 @@ public class ElevatorSub extends NetworkSubsystem{
     public void setPosition(double position, RequestType type){
 
         if(type == RequestType.kUP){
-            var request = leader_request.withPosition(position).withSlot(0);
             leader.setControl(leader_request.withPosition(position).withSlot(0));
         }else{
             leader.setControl(leader_request.withPosition(position).withSlot(1));
@@ -117,6 +133,7 @@ public class ElevatorSub extends NetworkSubsystem{
         
 
     }
+
 
     public double getMeters(){
         double gamma = ((124.5/42));

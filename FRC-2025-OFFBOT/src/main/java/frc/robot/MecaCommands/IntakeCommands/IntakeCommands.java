@@ -6,20 +6,31 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Mechanisms.Elevator.ElevatorSub;
+import frc.robot.Mechanisms.Elevator.ElevatorSub.RequestType;
 import frc.robot.Mechanisms.Indexer.IndexerSub;
 //import frc.robot.Mechanisms.Indexer.IndexerSub;
 import frc.robot.Mechanisms.Intake.IntakeSub;
+import frc.robot.Mechanisms.Outake.OutakeSub;
+import lib.ForgePlus.Equals.DomainUtils;
 
 public class IntakeCommands {
 
     public static Command setAngleUp(IntakeSub intake, double angle){
 
-        return Commands.run(()-> {intake.setPositionUp(angle);},intake).finallyDo(()->{intake.stopAng();});
+        return Commands.run(()-> {intake.setPositionUp(angle);},intake);
     }
+
+    public static Command setVoltageCommand(IntakeSub intake, double voltage){
+
+        return Commands.run(()-> {intake.setVoltage(voltage);},intake).finallyDo(()->{intake.stopAng();});
+    }
+
+
 
     public static Command setAngleDown(IntakeSub intake, double angle){
 
-        return Commands.run(()-> {intake.setPositionDown(angle);},intake);
+        return Commands.run(()-> {intake.setPositionDown(angle);},intake).finallyDo(()->{intake.stopAll();});
     }
 
     public static Command runIntakeManual(IntakeSub intake, DoubleSupplier joystick){
@@ -37,13 +48,18 @@ public class IntakeCommands {
     public static Command clearPiece(
         IntakeSub intake, 
         IndexerSub index, 
+        ElevatorSub elevator,
+        OutakeSub outake,
         double intakeSpeed,
         double rightSpeed,
         double leftSpeed, 
-        Debouncer timer
+        Debouncer timer, 
+        double angleUp, 
+        double angleDown
         ){ 
 
             return Commands.run(() -> {
+                System.out.println("Paso 1");
                 intake.runWheelsIntake(intakeSpeed);
                 index.runWheels(rightSpeed, leftSpeed);
             }, intake, index)
@@ -51,6 +67,7 @@ public class IntakeCommands {
             .until(() -> timer.calculate(index.getCurrentRight() > 27 || index.getCurrentLeft() > 27))
             
             .andThen(Commands.run(() -> {
+                System.out.println("Paso 2");
 
                 if (index.getCurrentRight() >= 27){
                     intake.runWheelsIntake(-intakeSpeed/2);
@@ -62,13 +79,36 @@ public class IntakeCommands {
 
                 }, intake, index).withTimeout(0.35).
 
-                andThen(
-                Commands.run(() -> {
+                andThen(Commands.run(() -> {
+                    System.out.println("Paso 3");
                     intake.runWheelsIntake(intakeSpeed);
                     index.runWheels(rightSpeed, leftSpeed);
-                }, intake, index))).finallyDo(()->{
+                }, intake, index)))
+                
+                .until(()-> index.hasPiece())
+                
+                .andThen(Commands.run(()-> {
+                    System.out.println("Paso 4");
+                    index.stop();
+                    intake.stopWheelsIntake();
+                    intake.setPositionUp(angleUp);
+
+                }).until(()-> DomainUtils.inRange(intake.getPositionAng(), angleUp - 2, angleUp + 2))
+
+                .andThen(Commands.run(()-> {
+                    System.out.println("Paso 5");
+                    elevator.setPosition(-elevator.metersToRot(63), RequestType.kDown);
+                    outake.runWheelsOutake(0.6);
+                })).withTimeout(3))
+                
+                .finallyDo(()->{
+                    System.out.println("Final");
+                    elevator.setPosition(-elevator.metersToRot(80), RequestType.kUP);
                     intake.stopAll(); 
-                    index.stop();});
+                    index.stop();
+                    outake.stopALL();
+                   ;});
+                    
         }
 
     public static Command outPiece(

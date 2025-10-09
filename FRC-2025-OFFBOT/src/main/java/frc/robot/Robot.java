@@ -31,7 +31,6 @@ public class Robot extends TimedRobot {
 
     NTPublisher.updateAllSendables();
 
-    NTPublisher.publish(NTPublisher.ROBOT, "Match/Time", DriverStation.getMatchTime());
   }
 
   @Override

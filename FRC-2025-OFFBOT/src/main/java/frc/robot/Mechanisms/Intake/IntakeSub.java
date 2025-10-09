@@ -54,7 +54,7 @@ public class IntakeSub extends NetworkSubsystem{
         MechanismsConstants.IntakeConstants.AngulatorInverted,
         IdleMode.kBrake,
         MechanismsConstants.IntakeConstants.AngulatorCurrentLimit,
-        false);
+        true);
         
         pidUp.setTolerance(OutConstants.pidTolerance);
         pidDown.setTolerance(OutConstants.pidTolerance);
@@ -72,17 +72,18 @@ public class IntakeSub extends NetworkSubsystem{
 
     @Override
     public void NetworkPeriodic(){
-        NTPublisher.publish("Encoder", getTableKey(), encoder.getPosition());
         NTPublisher.publish("Angulo", getTableKey(), getPositionAng());
         NTPublisher.publish("CurrentSetpoint", getTableKey(), currentSetpoint());
         NTPublisher.publish("Atgoal", getTableKey(), atGoal());
-        
+    }
+
+    public double getPositionAng(){ 
+        return (encoder.getPosition()  * 360); 
 
     }
 
-    private double getPositionAng(){ 
-        return (encoder.getPosition()  * 360); 
-
+    public void setVoltage(double voltage){
+        motorAng.setVoltage(voltage);
     }
 
 
@@ -91,7 +92,7 @@ public class IntakeSub extends NetworkSubsystem{
         double output;
 
         double pid = pidUp.calculate(targetPosition, getPositionAng()).getOutput();
-        double feedForward = ff.calculate(IntakeConstants.FFgains, 0 , 0).getOutput();
+        double feedForward = FeedForwardControl.calculate(IntakeConstants.FFgains, 0 , 0).getOutput();
 
         output = pid + feedForward;
 

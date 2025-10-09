@@ -58,10 +58,9 @@ public class OutakeSub extends NetworkSubsystem{
 
     @Override
     public void NetworkPeriodic(){
-        SmartDashboard.putNumber("mot", relEncoder.getPosition());
+        SmartDashboard.putNumber("angleoutake", relEncoder.getPosition());
     }
 
-    @AutoNetworkPublisher(key = "ArmPosition")
     public double getPosition(){ 
         return (relEncoder.getPosition() / 66.666) * 360;
     }
@@ -99,7 +98,6 @@ public class OutakeSub extends NetworkSubsystem{
         wheels.set(speed);
     }
 
-    @AutoNetworkPublisher(key = "CurrentSetpoint")
     public double currentSetpoint(){
         return pidUp.getSetpoint()*pidDown.getSetpoint() >= 0 ? pidUp.getSetpoint() : pidDown.getSetpoint();
     }
@@ -108,7 +106,6 @@ public class OutakeSub extends NetworkSubsystem{
         return wheels.get() != 0;
     }
 
-    @AutoNetworkPublisher(key = "AtGoal")
     public boolean atGoal(){
         return pidDown.atSetpoint() || pidUp.atSetpoint();
     }

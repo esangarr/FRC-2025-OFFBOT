@@ -76,7 +76,6 @@ public class OculusPlus extends NetworkSubsystem{
         return OptionalInt.empty();
     }
 
-    @AutoNetworkPublisher(key = "isTracking")
     public boolean isTracking() {
         Data.ProtobufQuestNavDeviceData latestDeviceData = deviceDataSubscriber.get();
         if (latestDeviceData != null) {
@@ -85,7 +84,6 @@ public class OculusPlus extends NetworkSubsystem{
         return false; 
     }
 
-    @AutoNetworkPublisher(key = "isConected")
     public boolean isConnected() {
         return Seconds.of(Timer.getTimestamp())
             .minus(Microseconds.of(frameDataSubscriber.getLastChange()))
@@ -123,7 +121,6 @@ public class OculusPlus extends NetworkSubsystem{
         return result;
     }
 
-    @AutoNetworkPublisher(key = "robotPose")
     public Pose2d getPose(){
         PoseFrame[] poseFrames = getAllUnreadPoseFrames();
 
@@ -158,7 +155,6 @@ public class OculusPlus extends NetworkSubsystem{
         nav.commandPeriodic();
     }
 
-    @AutoNetworkPublisher(key = "hasPose")
     public boolean hasPose(){
         return nav.isConnected() && nav.isTracking();
     }
