@@ -59,7 +59,6 @@ public class IntakeCommands {
         ){ 
 
             return Commands.run(() -> {
-                System.out.println("Paso 1");
                 intake.runWheelsIntake(intakeSpeed);
                 index.runWheels(rightSpeed, leftSpeed);
             }, intake, index)
@@ -67,7 +66,6 @@ public class IntakeCommands {
             .until(() -> timer.calculate(index.getCurrentRight() > 27 || index.getCurrentLeft() > 27))
             
             .andThen(Commands.run(() -> {
-                System.out.println("Paso 2");
 
                 if (index.getCurrentRight() >= 27){
                     intake.runWheelsIntake(-intakeSpeed/2);
@@ -80,30 +78,78 @@ public class IntakeCommands {
                 }, intake, index).withTimeout(0.35).
 
                 andThen(Commands.run(() -> {
-                    System.out.println("Paso 3");
                     intake.runWheelsIntake(intakeSpeed);
                     index.runWheels(rightSpeed, leftSpeed);
                 }, intake, index)))
                 
-                .until(()-> index.hasPiece())
-                
-                .andThen(Commands.run(()-> {
-                    System.out.println("Paso 4");
-                    index.stop();
-                    intake.stopWheelsIntake();
-                    intake.setPositionUp(angleUp);
-
-                })
 
                 .finallyDo(()->{
-                    System.out.println("Final");
-                    elevator.setPosition(-elevator.metersToRot(80), RequestType.kUP);
-                    intake.stopAll(); 
                     index.stop();
-                    outake.stopALL();
-                   ;}));
+                    intake.stopWheelsIntake();
+
+                   ;});
                     
         }
+
+        public static Command clearPieceComplete(
+            IntakeSub intake, 
+            IndexerSub index, 
+            ElevatorSub elevator,
+            OutakeSub outake,
+            double intakeSpeed,
+            double rightSpeed,
+            double leftSpeed, 
+            Debouncer timer, 
+            double angleUp, 
+            double angleDown
+            ){ 
+    
+                return Commands.run(() -> {
+    
+                    intake.runWheelsIntake(intakeSpeed);
+                    index.runWheels(rightSpeed, leftSpeed);
+                }, intake, index)
+    
+                .until(() -> timer.calculate(index.getCurrentRight() > 27 || index.getCurrentLeft() > 27))
+                
+                .andThen(Commands.run(() -> {
+    
+    
+                    if (index.getCurrentRight() >= 27){
+                        intake.runWheelsIntake(-intakeSpeed/2);
+                        index.runWheels(-rightSpeed, leftSpeed);}
+    
+                    if (index.getCurrentLeft() >= 27){
+                        intake.runWheelsIntake(-intakeSpeed/2);
+                        index.runWheels(rightSpeed, -leftSpeed);}
+    
+                    }, intake, index).withTimeout(0.35).
+    
+                    andThen(Commands.run(() -> {
+   
+                        intake.runWheelsIntake(intakeSpeed);
+                        index.runWheels(rightSpeed, leftSpeed);
+                    }, intake, index)))
+                    
+                    .until(()-> index.hasPiece())
+                    
+                    .andThen(Commands.run(()-> {
+  
+                        index.stop();
+                        intake.stopWheelsIntake();
+                        intake.setPositionUp(angleUp);
+    
+                    })
+    
+                    .finallyDo(()->{
+      
+                        elevator.setPosition(-elevator.metersToRot(80), RequestType.kUP);
+                        intake.stopAll(); 
+                        index.stop();
+                        outake.stopALL();
+                       ;}));
+                        
+            }
 
     public static Command outPiece(
         IntakeSub intake, 

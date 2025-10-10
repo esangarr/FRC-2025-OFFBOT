@@ -15,7 +15,8 @@ import lib.ForgePlus.REV.SparkMax.ForgeSparkMax;
 
 public class SwerveModule{
 
-    public static final int driveCurrentLimit = 50;
+    public static final int driveCurrentLimit = 40;
+
     public static final int turnCurrentLimit = 20;
     public static final DCMotor NEOGearbox = DCMotor.getNEO(1);
     public static final double WHEELRADIUS = Units.inchesToMeters(2.0);
@@ -230,7 +231,7 @@ public class SwerveModule{
         driveSparkMax.flashConfiguration(
             isDriveMotorInverted,
             IdleMode.kBrake,
-            43,
+            40,
             true);
         
         turnSparkMax.flashConfiguration(

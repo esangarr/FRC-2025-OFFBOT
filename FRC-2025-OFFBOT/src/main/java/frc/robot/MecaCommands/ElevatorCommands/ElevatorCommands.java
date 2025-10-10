@@ -30,18 +30,23 @@ public class ElevatorCommands {
 
         return Commands.run(()->{ 
             Elev.setPosition(-Elev.metersToRot(63), RequestType.kDown);
-            outake.setPositionDown(2);
             outake.runWheelsOutake(0.6);
-        },Elev, outake, index).until(()-> !index.hasPiece())
-       
-        .andThen(Commands.run(()-> {
-            outake.stopwheelsOutake();
-            Elev.setPosition(-setpoint, RequestType.kUP);
-        }, Elev, outake, index))
+            outake.setPositionDown(1);
+
+        },Elev, outake, index)
+        .withTimeout(0.5).
+        andThen(Commands.sequence(
+            Commands.run(()-> {outake.stopwheelsOutake(); Elev.setPosition(-setpoint, RequestType.kUP);
+            }, Elev, outake)).until(()-> Elev.atGoal()),
+            Commands.run(()-> {outake.setPositionUp(targetOutake);} )
         
-        .finallyDo(()->{
+        .andThen(Commands.run(()-> {
+            outake.setPositionUp(targetOutake);
+        }, Elev, outake, index)).
+        
+        finallyDo(()->{
             Elev.StopMotors();
-        });
+        }));
 
     }
 

@@ -25,9 +25,7 @@ public class ClimberSub extends NetworkSubsystem{
     public ClimberSub () {
         super("ClimberSubsystem", false);
 
-        climberWheels = new ForgeSparkMax(ClimberConstants.ClimbWheel_ID
-        
-        , MotorType.kBrushless, "MotorClimb");
+        climberWheels = new ForgeSparkMax(ClimberConstants.ClimbWheel_ID, MotorType.kBrushless, "MotorClimb");
 
         climberWheels.flashConfiguration(
             ClimberConstants.cimberInverted, 

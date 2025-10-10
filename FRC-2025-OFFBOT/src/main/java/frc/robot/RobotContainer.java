@@ -23,6 +23,7 @@ import frc.robot.DriveTrain.Vision;
 import frc.robot.MecaCommands.ClimberCommands.ClimberCommands;
 import frc.robot.MecaCommands.ElevatorCommands.ElevatorCommands;
 import frc.robot.MecaCommands.IntakeCommands.IntakeCommands;
+//import frc.robot.MecaCommands.IntakeCommands.IntakeCommands;
 import frc.robot.MecaCommands.OutakeCommands.OutakeCommands;
 import frc.robot.Mechanisms.Climber.ClimberSub;
 import frc.robot.Mechanisms.Elevator.ElevatorSub;
@@ -97,10 +98,7 @@ public class RobotContainer {
       smooth.filter(()-> -driver.getLeftY() * 0.7),
       smooth.filter(()-> -driver.getLeftX() * 0.7),
       smooth.filter(()-> -driver.getRightX() * 0.6)));
-    
-    chassis.setDefaultCommand(DriveCommands.joystickDrive(chassis, ()-> driver.getLeftY(), ()-> driver.getLeftX(), ()-> -driver.getRightX()));
-
-    
+   
     driver.rightBumper().whileTrue(DriveCommands.setTurnAngle(chassis, Rotation2d.fromRadians(3.1416)));
     driver.leftBumper().whileTrue(DriveCommands.setVelocity(chassis, 1));
 
