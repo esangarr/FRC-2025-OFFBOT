@@ -2,34 +2,24 @@ package frc.robot.Mechanisms.Intake;
 
 import lib.ForgePlus.Math.Profiles.Control.FeedForwardControl;
 import lib.ForgePlus.Math.Profiles.Control.PIDControl;
-import lib.ForgePlus.NetworkTableUtils.NTPublisher;
 import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.NetworkSubsystem;
-import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.Annotations.AutoNetworkPublisher;
 import lib.ForgePlus.REV.SparkMax.ForgeSparkMax;
 
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
 import frc.robot.Mechanisms.MechanismsConstants;
 import frc.robot.Mechanisms.MechanismsConstants.IntakeConstants;
-import frc.robot.Mechanisms.MechanismsConstants.OutConstants;
 
 public class IntakeSub extends NetworkSubsystem{
 
     private ForgeSparkMax motorAng;
     private PIDControl pidUp;
     private PIDControl pidDown;
-
-    private FeedForwardControl ff;
 
     private TalonFX wheels;
     private TalonFXConfiguration IntConfigs;
@@ -45,8 +35,6 @@ public class IntakeSub extends NetworkSubsystem{
         encoder = motorAng.getAbsoluteEncoder();
         pidUp = new PIDControl(IntakeConstants.pidGainsUp);
         pidDown = new PIDControl(IntakeConstants.pidGainsDown);
-
-        ff = new FeedForwardControl();
 
 
         //Config Motor Angulador
@@ -72,9 +60,9 @@ public class IntakeSub extends NetworkSubsystem{
 
     @Override
     public void NetworkPeriodic(){
-        publishOutput("Angulo", getPositionAng());
-        publishOutput("CurrentSetpoint", currentSetpoint());
-        publishOutput("Atgoal",  atGoal());
+        publish("Intake/Angulo", getPositionAng());
+        publish("Intake/CurrentSetpoint", currentSetpoint());
+        publish("Intake/Algoal",  atGoal());
     }
 
     public double getPositionAng(){ 

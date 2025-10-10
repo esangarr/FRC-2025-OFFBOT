@@ -37,7 +37,7 @@ public class CommandChooser{
             chooser.setDefaultOption(defaultCommand.name(), defaultCommand.command());
         }
 
-        NTPublisher.publish(table, key, chooser);
+       // NTPublisher.publish(table, key, chooser);
     }
 
     /**
@@ -82,7 +82,6 @@ public class CommandChooser{
             }
         } 
         
-        NTPublisher.publish(table, key, chooser);
     }
 
     /**

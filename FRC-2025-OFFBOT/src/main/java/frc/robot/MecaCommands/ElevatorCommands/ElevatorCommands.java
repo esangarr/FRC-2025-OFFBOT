@@ -34,10 +34,13 @@ public class ElevatorCommands {
             outake.setPositionDown(1);
 
         },Elev, outake, index)
-        .withTimeout(0.5).
-        andThen(Commands.sequence(
-            Commands.run(()-> {outake.stopwheelsOutake(); Elev.setPosition(-setpoint, RequestType.kUP);
-            }, Elev, outake)).until(()-> Elev.atGoal()),
+        .until(()-> index.noPiece() || outake.getCurrent() >= 29)
+
+        .andThen(
+            Commands.sequence(
+            Commands.run(()-> {
+                outake.stopwheelsOutake(); 
+                Elev.setPosition(-setpoint, RequestType.kUP);}, Elev, outake)).until(()-> Elev.atGoal()),
             Commands.run(()-> {outake.setPositionUp(targetOutake);} )
         
         .andThen(Commands.run(()-> {
@@ -55,7 +58,10 @@ public class ElevatorCommands {
         return Commands.run(()->{ 
             Elev.setPosition(-setpoint, RequestType.kDown);
             outake.setPositionUp(targetOutake);
-        },Elev, outake).finallyDo(()->{Elev.StopMotors();});
+        },Elev, outake).finallyDo(()->{
+            Elev.StopMotors();
+            outake.stopALL();
+            });
 
     }
 

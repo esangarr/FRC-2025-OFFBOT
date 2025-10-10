@@ -1,21 +1,16 @@
 
 package frc.robot.Mechanisms.Elevator;
 
-import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.ExternalFeedbackConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
-import com.ctre.phoenix6.controls.StrictFollower;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj.Encoder;
 import frc.robot.Mechanisms.MechanismsConstants.ElevatorConstants;
-import frc.robot.Mechanisms.MechanismsConstants.IntakeConstants;
 import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.NetworkSubsystem;
 
 public class ElevatorSub extends NetworkSubsystem{
@@ -187,10 +182,11 @@ public class ElevatorSub extends NetworkSubsystem{
     public void NetworkPeriodic() {
         updatePosition();
 
-       publishOutput("Rotor/Rotations", rotorPosRotations);
-       publishOutput("Rotor/metros", getMeters());
-       publishOutput("Rotor/inverse", metersToRot(getMeters()));
-       publishOutput("Rotor/ElevatorSetpoint", getSetpoint());
+       publish("Rotor/Rotations", rotorPosRotations);
+       publish("Rotor/Altura cm", getMeters());
+       publish("Rotor/inverse", metersToRot(getMeters()));
+       publish("Rotor/ElevatorSetpoint", getSetpoint());
+       publish("Rotor/ElevatorAtGoal", atGoal());
 
     }
     }

@@ -6,7 +6,6 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Mechanisms.MechanismsConstants.IndexerConstants;
 import lib.ForgePlus.REV.SparkMax.ForgeSparkMax;
-import lib.ForgePlus.NetworkTableUtils.NTPublisher;
 import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.NetworkSubsystem;
 
 public class IndexerSub extends NetworkSubsystem{
@@ -44,7 +43,7 @@ public class IndexerSub extends NetworkSubsystem{
 
     @Override
     public void NetworkPeriodic(){
-        publishOutput("Has Piece", hasPiece());
+        publish("Index/Has Piece", hasPiece());
      }
 
     public void runWheels(double speedRight, double speedLeft){
@@ -65,6 +64,10 @@ public class IndexerSub extends NetworkSubsystem{
 
     public boolean hasPiece(){
         return BeamSensor.get();
+    }
+
+    public boolean noPiece(){
+        return !BeamSensor.get();
     }
 
     public double rightSpin(){

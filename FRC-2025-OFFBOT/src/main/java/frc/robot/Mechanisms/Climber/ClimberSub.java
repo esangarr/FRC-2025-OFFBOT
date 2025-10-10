@@ -7,10 +7,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import frc.robot.Mechanisms.MechanismsConstants.ClimberConstants;
-import frc.robot.Mechanisms.MechanismsConstants.ElevatorConstants;
-import lib.ForgePlus.Math.Profiles.Control.PIDControl;
 import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.NetworkSubsystem;
 import lib.ForgePlus.REV.SparkMax.ForgeSparkMax;
 

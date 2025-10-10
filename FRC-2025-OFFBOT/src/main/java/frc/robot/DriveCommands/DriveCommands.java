@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
-import com.ctre.phoenix6.swerve.jni.SwerveJNI.ModulePosition;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -24,7 +22,6 @@ import frc.robot.DriveTrain.Swerve;
 import lib.ForgePlus.Math.Profiles.Control.MotionModelControl;
 import lib.ForgePlus.Math.Profiles.Control.PositionState;
 import lib.ForgePlus.Math.Profiles.ProfileGains.MotionModelGains;
-import lib.ForgePlus.REV.REVBlinkin.REVBlinkin.PatternType;
 import lib.ForgePlus.SwerveLib.Odometer.OdometerUtils;
 
 public class DriveCommands {

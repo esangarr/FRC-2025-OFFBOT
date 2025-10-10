@@ -1,16 +1,10 @@
 package frc.robot.DriveTrain;
 import java.util.List;
 import java.util.Optional;
-import java.util.OptionalInt;
-
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.photonvision.PhotonUtils;
-import org.photonvision.simulation.PhotonCameraSim;
-import org.photonvision.simulation.SimCameraProperties;
-import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.photonvision.targeting.TargetCorner;
 
@@ -24,7 +18,6 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.VecBuilder;
 import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.NetworkSubsystem;
-import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.Annotations.AutoNetworkPublisher;
 
 public class Vision extends NetworkSubsystem{
 
@@ -70,7 +63,7 @@ public class Vision extends NetworkSubsystem{
                         // Change our trust in the measurement based on the tags we can see
                         var estStdDevs = getEstimationStdDevs();
 
-                        publishOutput("Pose", est.estimatedPose.toPose2d());
+                        publish("Pose", est.estimatedPose.toPose2d());
 
                         estConsumer.accept(est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
                     });
@@ -79,7 +72,7 @@ public class Vision extends NetworkSubsystem{
         
     }
 
-    @AutoNetworkPublisher(key = "Target")
+
     public boolean hasTarget(){
         return target;
     }

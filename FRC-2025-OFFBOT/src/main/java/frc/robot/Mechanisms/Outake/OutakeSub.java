@@ -8,12 +8,9 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Mechanisms.MechanismsConstants.OutConstants;
 import lib.ForgePlus.Math.Profiles.Control.PIDControl;
 import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.NetworkSubsystem;
-import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.Annotations.AutoNetworkPublisher;
 import lib.ForgePlus.REV.SparkMax.ForgeSparkMax;
 
 public class OutakeSub extends NetworkSubsystem{
@@ -59,12 +56,17 @@ public class OutakeSub extends NetworkSubsystem{
 
     @Override
     public void NetworkPeriodic(){
-        publishOutput("angleoutake", getPosition());
-        publishOutput("CurrentSetpoint", currentSetpoint());
+        publish("angleoutake", getPosition());
+        publish("CurrentSetpoint", currentSetpoint());
+        publish("GetCurrent", getCurrent());
     }
 
     public double getPosition(){ 
         return (relEncoder.getPosition() / 66.666) * 360;
+    }
+
+    public double getCurrent(){
+        return wheels.getTorqueCurrent().getValueAsDouble();
     }
 
     

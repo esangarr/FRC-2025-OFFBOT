@@ -1,4 +1,4 @@
-package lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.Annotations;
+package lib.ForgePlus.NetworkTableUtils.NetworkSubsystem;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -13,9 +13,9 @@ import java.lang.annotation.Target;
  * a specific NetworkTables entry. The {@code key} provides the name of the entry in NetworkTables where the data
  * will be published.</p>
  */
-@Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface AutoNetworkPublisher{
+@Retention(RetentionPolicy.RUNTIME)
+public @interface AutoNetworkPublish{
     /**
      * The NetworkTables key where the method's return value will be published.
      *

@@ -2,15 +2,6 @@ package frc.robot.Mechanisms;
 
 import lib.ForgePlus.Math.Profiles.ProfileGains.CompleteFeedForwardGains;
 
-import org.opencv.core.Mat;
-
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.VelocityVoltage;
-
-import edu.wpi.first.math.controller.PIDController;
-import lib.ForgePlus.Math.Profiles.ProfileGains.CompleteFeedForwardGains;
-import lib.ForgePlus.Math.Profiles.ProfileGains.PIDFGains;
-
 import lib.ForgePlus.Math.Profiles.ProfileGains.PIDGains;
 
 public class MechanismsConstants {
@@ -27,7 +18,7 @@ public class MechanismsConstants {
         public static final int RightWheelsCurrentLimit = 0;
         public static final int LeftWheelsCurrentLimit = 0;
 
-        public static final int DIO_PORT_SENSOR = 0;
+        public static final int DIO_PORT_SENSOR = 8;
 
     }
 

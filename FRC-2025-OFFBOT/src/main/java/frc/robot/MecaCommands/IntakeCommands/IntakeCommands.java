@@ -3,16 +3,13 @@ package frc.robot.MecaCommands.IntakeCommands;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Mechanisms.Elevator.ElevatorSub;
 import frc.robot.Mechanisms.Elevator.ElevatorSub.RequestType;
 import frc.robot.Mechanisms.Indexer.IndexerSub;
-//import frc.robot.Mechanisms.Indexer.IndexerSub;
 import frc.robot.Mechanisms.Intake.IntakeSub;
 import frc.robot.Mechanisms.Outake.OutakeSub;
-import lib.ForgePlus.Equals.DomainUtils;
 
 public class IntakeCommands {
 
@@ -63,19 +60,19 @@ public class IntakeCommands {
                 index.runWheels(rightSpeed, leftSpeed);
             }, intake, index)
 
-            .until(() -> timer.calculate(index.getCurrentRight() > 27 || index.getCurrentLeft() > 27))
+            .until(() -> timer.calculate(index.getCurrentRight() > 26 || index.getCurrentLeft() > 26))
             
             .andThen(Commands.run(() -> {
 
-                if (index.getCurrentRight() >= 27){
+                if (index.getCurrentRight() >= 26){
                     intake.runWheelsIntake(-intakeSpeed/2);
                     index.runWheels(-rightSpeed, leftSpeed);}
 
-                if (index.getCurrentLeft() >= 27){
+                if (index.getCurrentLeft() >= 26){
                     intake.runWheelsIntake(-intakeSpeed/2);
                     index.runWheels(rightSpeed, -leftSpeed);}
 
-                }, intake, index).withTimeout(0.35).
+                }, intake, index).withTimeout(0.33).
 
                 andThen(Commands.run(() -> {
                     intake.runWheelsIntake(intakeSpeed);

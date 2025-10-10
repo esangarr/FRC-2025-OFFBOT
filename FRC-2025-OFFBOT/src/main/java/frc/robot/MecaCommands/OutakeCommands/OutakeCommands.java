@@ -4,7 +4,6 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.Mechanisms.Intake.IntakeSub;
 import frc.robot.Mechanisms.Outake.OutakeSub;
 
 public class OutakeCommands {
@@ -42,13 +41,15 @@ public class OutakeCommands {
     public static Command moveWheels(OutakeSub outake, double speed){
         return Commands.run(()-> {
             outake.runWheelsOutake(speed);
+            
         }, outake ).finallyDo(()-> {outake.stopwheelsOutake();});
     }
 
-    public static Command shoot(OutakeSub outake, double speed){
+    public static Command shootDunk(OutakeSub outake, double speed){
         return Commands.run(()-> {
+            outake.setPositionDown(outake.currentSetpoint() - 30);
             outake.runWheelsOutake(speed);
-        }, outake ).finallyDo(()-> {outake.stopALL();});
+        }, outake ).finallyDo(()-> {outake.stopALL();});    
     }
 
 

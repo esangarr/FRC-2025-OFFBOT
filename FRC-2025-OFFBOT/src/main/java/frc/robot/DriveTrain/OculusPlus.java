@@ -20,7 +20,6 @@ import gg.questnav.questnav.protos.generated.Data;
 import gg.questnav.questnav.protos.wpilib.DeviceDataProto;
 import gg.questnav.questnav.protos.wpilib.FrameDataProto;
 import lib.ForgePlus.Math.StandardDeviations;
-import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.Annotations.AutoNetworkPublisher;
 import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.NetworkSubsystem;
 
 

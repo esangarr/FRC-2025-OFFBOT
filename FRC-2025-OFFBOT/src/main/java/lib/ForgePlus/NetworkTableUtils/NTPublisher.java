@@ -18,6 +18,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructArraySubscriber;
@@ -31,8 +32,6 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import lib.ForgePlus.Math.Profiles.Control.MotionModelControl;
-import lib.ForgePlus.Math.Profiles.Control.PIDControl;
 
 /**
  * Utility class for publishing and retrieving various data types from NetworkTables.
@@ -84,15 +83,9 @@ public class NTPublisher{
    
     private static final Map<String, Sendable> sendables = new HashMap<>();
 
-    //Common table names
-
-    public static final String SMARTDASHBOARD = "SmartDashboard";
-
-    public static final String NETWORKTABLES = "NetworkTables";
+    private static final Map<String, NetworkTableEntry> simpleEntries = new HashMap<>();
 
     public static final String ROBOT = "Robot";
-
-    public static final String FORGE = "Forge";
 
     //Publishers
     private static final ConcurrentHashMap<String, StructPublisher<Translation2d>> t2 = new ConcurrentHashMap<>();
@@ -224,7 +217,7 @@ public class NTPublisher{
             this.specialButtonNames[0] = "Start";
             this.specialButtonNames[1] = "Back";
 
-            publish(table, name, this);
+            //publish(table, name, this);
 
         }
 
@@ -266,7 +259,7 @@ public class NTPublisher{
             this.specialButtonNames[0] = "Options";
             this.specialButtonNames[1] = "Create";
         
-            publish(table, name, this);
+            //publish(table, name, this);
 
         }
 
@@ -308,7 +301,7 @@ public class NTPublisher{
             this.specialButtonNames[0] = "Options";
             this.specialButtonNames[1] = "Share";
 
-            publish(table, name, this);
+            //publish(table, name, this);
         }
 
         @Override
@@ -356,7 +349,11 @@ public class NTPublisher{
      * @param value     The double value to publish.
      */
     public static void publish(String tableName, String key, double value){
-        ntInstance.getTable(tableName).getEntry(key).setDouble(value);
+        
+        NetworkTableEntry entry = simpleEntries.computeIfAbsent(fullPathOf(tableName, key), k ->
+            ntInstance.getTable(tableName).getEntry(key)
+        );
+        entry.setDouble(value);
     }
 
     /**
@@ -367,7 +364,11 @@ public class NTPublisher{
      * @param value     The boolean value to publish.
      */
     public static void publish(String tableName, String key, boolean value){
-        ntInstance.getTable(tableName).getEntry(key).setBoolean(value);
+
+        NetworkTableEntry entry = simpleEntries.computeIfAbsent(fullPathOf(tableName, key), k ->
+        ntInstance.getTable(tableName).getEntry(key)
+        );
+        entry.setBoolean(value);
     }
 
     /**
@@ -378,7 +379,10 @@ public class NTPublisher{
      * @param value     The String value to publish.
      */
     public static void publish(String tableName, String key, String value){
-        ntInstance.getTable(tableName).getEntry(key).setString(value);
+        NetworkTableEntry entry = simpleEntries.computeIfAbsent(fullPathOf(tableName, key), k ->
+        ntInstance.getTable(tableName).getEntry(key)
+        );
+        entry.setString(value);
     }
 
     /**
@@ -389,7 +393,10 @@ public class NTPublisher{
      * @param value     The double array to publish.
      */
     public static void publish(String tableName, String key, double[] value){
-        ntInstance.getTable(tableName).getEntry(key).setDoubleArray(value);
+        NetworkTableEntry entry = simpleEntries.computeIfAbsent(fullPathOf(tableName, key), k ->
+        ntInstance.getTable(tableName).getEntry(key)
+        );
+        entry.setDoubleArray(value);
     }
 
     /**
@@ -400,7 +407,10 @@ public class NTPublisher{
      * @param value     The boolean array to publish.
      */
     public static void publish(String tableName, String key, boolean[] value){
-        ntInstance.getTable(tableName).getEntry(key).setBooleanArray(value);
+        NetworkTableEntry entry = simpleEntries.computeIfAbsent(fullPathOf(tableName, key), k ->
+        ntInstance.getTable(tableName).getEntry(key)
+        );
+        entry.setBooleanArray(value);
     }
 
     /**
@@ -411,7 +421,10 @@ public class NTPublisher{
      * @param value     The String array to publish.
      */
     public static void publish(String tableName, String key, String[] value){
-        ntInstance.getTable(tableName).getEntry(key).setStringArray(value);
+        NetworkTableEntry entry = simpleEntries.computeIfAbsent(fullPathOf(tableName, key), k ->
+        ntInstance.getTable(tableName).getEntry(key)
+        );
+        entry.setStringArray(value);
     }
 
     /**
@@ -853,9 +866,9 @@ public class NTPublisher{
      * @param key       The key for the entry.
      * @param value     The {@link MotionModelControl} object to publish.
      */
-    public static void publish(String tableName, String key, MotionModelControl value){
-        publish(tableName, key, value.getController());
-    }
+    //public static void publish(String tableName, String key, MotionProfileLoop value){
+       // publish(tableName, key, value.getController());
+    //}
 
     /**
      * Publishes a {@link PIDControl} object to NetworkTables.
@@ -864,9 +877,9 @@ public class NTPublisher{
      * @param key       The key for the entry.
      * @param value     The {@link PIDControl} object to publish.
      */
-    public static void publish(String tableName, String key, PIDControl value){
-        publish(tableName, key, value.getController());
-    }
+    //public static void publish(String tableName, String key, PIDLoop value){
+       // publish(tableName, key, value.getController());
+    //}
 
     /**
      * Updates all registered {@link Sendable} objects in NetworkTables. <b>Must call this method periodically</b>
@@ -885,9 +898,13 @@ public class NTPublisher{
      * @param defaultValue The default value if the key is not found.
      * @return The retrieved double value.
      */
-    public static double retrieve(String TableName, String key, double defaultValue){
+    public static double retrieve(String tableName, String key, double defaultValue){
 
-        return ntInstance.getTable(TableName).getEntry(key).getDouble(defaultValue);
+        NetworkTableEntry entry = simpleEntries.computeIfAbsent(fullPathOf(tableName, key), k ->
+        ntInstance.getTable(tableName).getEntry(key)
+        );
+
+        return entry.getDouble(defaultValue);
     }
 
     /**
@@ -898,8 +915,13 @@ public class NTPublisher{
      * @param defaultValue The default value if the key is not found.
      * @return The retrieved boolean value.
      */
-    public static boolean retrieve(String TableName, String key, boolean defaultValue){
-        return ntInstance.getTable(TableName).getEntry(key).getBoolean(defaultValue);
+    public static boolean retrieve(String tableName, String key, boolean defaultValue){
+
+        NetworkTableEntry entry = simpleEntries.computeIfAbsent(fullPathOf(tableName, key), k ->
+        ntInstance.getTable(tableName).getEntry(key)
+        );
+
+        return entry.getBoolean(defaultValue);
     }
 
     /**
@@ -910,8 +932,12 @@ public class NTPublisher{
      * @param defaultValue The default array if the key is not found.
      * @return The retrieved array of double values.
      */
-    public static double[] retrieve(String TableName, String key, double[] defaultValue){
-        return ntInstance.getTable(TableName).getEntry(key).getDoubleArray(defaultValue);
+    public static double[] retrieve(String tableName, String key, double[] defaultValue){
+
+        NetworkTableEntry entry = simpleEntries.computeIfAbsent(fullPathOf(tableName, key), k ->
+        ntInstance.getTable(tableName).getEntry(key)
+        );
+        return entry.getDoubleArray(defaultValue);
     }
 
     /**
@@ -922,8 +948,11 @@ public class NTPublisher{
      * @param defaultValue The default array if the key is not found.
      * @return The retrieved array of boolean values.
      */
-    public static boolean[] retrieve(String TableName, String key, boolean[] defaultValue){
-        return ntInstance.getTable(TableName).getEntry(key).getBooleanArray(defaultValue);
+    public static boolean[] retrieve(String tableName, String key, boolean[] defaultValue){
+        NetworkTableEntry entry = simpleEntries.computeIfAbsent(fullPathOf(tableName, key), k ->
+        ntInstance.getTable(tableName).getEntry(key)
+        );
+        return entry.getBooleanArray(defaultValue);
     }
 
     /**
@@ -934,8 +963,13 @@ public class NTPublisher{
      * @param defaultValue The default value if the key is not found.
      * @return The retrieved String value.
      */
-    public static String retrieve(String TableName, String key, String defaultValue){
-        return ntInstance.getTable(TableName).getEntry(key).getString(defaultValue);
+    public static String retrieve(String tableName, String key, String defaultValue){
+
+        NetworkTableEntry entry = simpleEntries.computeIfAbsent(fullPathOf(tableName, key), k ->
+        ntInstance.getTable(tableName).getEntry(key)
+        );
+
+        return entry.getString(defaultValue);
     }
 
     /**
@@ -946,8 +980,12 @@ public class NTPublisher{
      * @param defaultValue The default array if the key is not found.
      * @return The retrieved array of String values.
      */
-    public static String[] retrieve(String TableName, String key, String[] defaultValue){
-        return ntInstance.getTable(TableName).getEntry(key).getStringArray(defaultValue);
+    public static String[] retrieve(String tableName, String key, String[] defaultValue){
+        NetworkTableEntry entry = simpleEntries.computeIfAbsent(fullPathOf(tableName, key), k ->
+        ntInstance.getTable(tableName).getEntry(key)
+        );
+
+        return entry.getStringArray(defaultValue);
     }
 
     /**
@@ -958,10 +996,10 @@ public class NTPublisher{
      * @param defaultValue The default value if the key is not found.
      * @return The retrieved {@link Pose2d} object.
      */
-    public static Pose2d retrieve(String TableName, String key, Pose2d defaultValue){
+    public static Pose2d retrieve(String tableName, String key, Pose2d defaultValue){
 
-        StructSubscriber<Pose2d> subscriber = p2P.computeIfAbsent(fullPathOf(TableName, key), k ->
-            ntInstance.getTable(TableName).getStructTopic(key, Pose2d.struct).subscribe(defaultValue)
+        StructSubscriber<Pose2d> subscriber = p2P.computeIfAbsent(fullPathOf(tableName, key), k ->
+            ntInstance.getTable(tableName).getStructTopic(key, Pose2d.struct).subscribe(defaultValue)
         );
 
         return subscriber.get();
@@ -975,10 +1013,10 @@ public class NTPublisher{
      * @param defaultValue The default array if the key is not found.
      * @return The retrieved array of {@link Pose2d} objects.
      */
-    public static Pose2d[] retrieve(String TableName, String key, Pose2d[] defaultValue){
+    public static Pose2d[] retrieve(String tableName, String key, Pose2d[] defaultValue){
 
-        StructArraySubscriber<Pose2d> subscriber = ap2P.computeIfAbsent(fullPathOf(TableName, key), k ->
-            ntInstance.getTable(TableName).getStructArrayTopic(key, Pose2d.struct).subscribe(defaultValue)
+        StructArraySubscriber<Pose2d> subscriber = ap2P.computeIfAbsent(fullPathOf(tableName, key), k ->
+            ntInstance.getTable(tableName).getStructArrayTopic(key, Pose2d.struct).subscribe(defaultValue)
         );
 
         return subscriber.get();
@@ -992,10 +1030,10 @@ public class NTPublisher{
      * @param defaultValue The default value if the key is not found.
      * @return The retrieved {@link Pose3d} object.
      */
-    public static Pose3d retrieve(String TableName, String key, Pose3d defaultValue){
+    public static Pose3d retrieve(String tableName, String key, Pose3d defaultValue){
     
-        StructSubscriber<Pose3d> subscriber = p3P.computeIfAbsent(fullPathOf(TableName, key), k ->
-            ntInstance.getTable(TableName).getStructTopic(key, Pose3d.struct).subscribe(defaultValue)
+        StructSubscriber<Pose3d> subscriber = p3P.computeIfAbsent(fullPathOf(tableName, key), k ->
+            ntInstance.getTable(tableName).getStructTopic(key, Pose3d.struct).subscribe(defaultValue)
         );
 
         return subscriber.get();
@@ -1009,10 +1047,10 @@ public class NTPublisher{
      * @param defaultValue The default array if the key is not found.
      * @return The retrieved array of {@link Pose3d} objects.
      */
-    public static Pose3d[] retrieve(String TableName, String key, Pose3d[] defaultValue){
+    public static Pose3d[] retrieve(String tableName, String key, Pose3d[] defaultValue){
 
-        StructArraySubscriber<Pose3d> subscriber = ap3P.computeIfAbsent(fullPathOf(TableName, key), k ->
-            ntInstance.getTable(TableName).getStructArrayTopic(key, Pose3d.struct).subscribe(defaultValue)
+        StructArraySubscriber<Pose3d> subscriber = ap3P.computeIfAbsent(fullPathOf(tableName, key), k ->
+            ntInstance.getTable(tableName).getStructArrayTopic(key, Pose3d.struct).subscribe(defaultValue)
         );
 
         return subscriber.get();
@@ -1026,10 +1064,10 @@ public class NTPublisher{
      * @param defaultValue The default value if the key is not found.
      * @return The retrieved {@link Translation2d} object.
      */
-    public static Translation2d retrieve(String TableName, String key, Translation2d defaultValue){
+    public static Translation2d retrieve(String tableName, String key, Translation2d defaultValue){
 
-        StructSubscriber<Translation2d> subscriber = t2P.computeIfAbsent(fullPathOf(TableName, key), k ->
-            ntInstance.getTable(TableName).getStructTopic(key, Translation2d.struct).subscribe(defaultValue)
+        StructSubscriber<Translation2d> subscriber = t2P.computeIfAbsent(fullPathOf(tableName, key), k ->
+            ntInstance.getTable(tableName).getStructTopic(key, Translation2d.struct).subscribe(defaultValue)
         );
 
         return subscriber.get();
@@ -1043,10 +1081,10 @@ public class NTPublisher{
      * @param defaultValue The default array if the key is not found.
      * @return The retrieved array of {@link Translation2d} objects.
      */
-    public static Translation2d[] retrieve(String TableName, String key, Translation2d[] defaultValue){
+    public static Translation2d[] retrieve(String tableName, String key, Translation2d[] defaultValue){
         
-        StructArraySubscriber<Translation2d> subscriber = at2P.computeIfAbsent(fullPathOf(TableName, key), k ->
-            ntInstance.getTable(TableName).getStructArrayTopic(key, Translation2d.struct).subscribe(defaultValue)
+        StructArraySubscriber<Translation2d> subscriber = at2P.computeIfAbsent(fullPathOf(tableName, key), k ->
+            ntInstance.getTable(tableName).getStructArrayTopic(key, Translation2d.struct).subscribe(defaultValue)
         );
 
         return subscriber.get();
@@ -1060,10 +1098,10 @@ public class NTPublisher{
      * @param defaultValue The default value if the key is not found.
      * @return The retrieved {@link Translation3d} object.
      */
-    public static Translation3d retrieve(String TableName, String key, Translation3d defaultValue){
+    public static Translation3d retrieve(String tableName, String key, Translation3d defaultValue){
 
-        StructSubscriber<Translation3d> subscriber = t3P.computeIfAbsent(fullPathOf(TableName, key), k ->
-            ntInstance.getTable(TableName).getStructTopic(key, Translation3d.struct).subscribe(defaultValue)
+        StructSubscriber<Translation3d> subscriber = t3P.computeIfAbsent(fullPathOf(tableName, key), k ->
+            ntInstance.getTable(tableName).getStructTopic(key, Translation3d.struct).subscribe(defaultValue)
         );
 
         return subscriber.get();
@@ -1077,10 +1115,10 @@ public class NTPublisher{
      * @param defaultValue The default array if the key is not found.
      * @return The retrieved array of {@link Translation3d} objects.
      */
-    public static Translation3d[] retrieve(String TableName, String key, Translation3d[] defaultValue){
+    public static Translation3d[] retrieve(String tableName, String key, Translation3d[] defaultValue){
 
-        StructArraySubscriber<Translation3d> subscriber = at3P.computeIfAbsent(fullPathOf(TableName, key), k ->
-            ntInstance.getTable(TableName).getStructArrayTopic(key, Translation3d.struct).subscribe(defaultValue)
+        StructArraySubscriber<Translation3d> subscriber = at3P.computeIfAbsent(fullPathOf(tableName, key), k ->
+            ntInstance.getTable(tableName).getStructArrayTopic(key, Translation3d.struct).subscribe(defaultValue)
         );
 
         return subscriber.get();
@@ -1094,10 +1132,10 @@ public class NTPublisher{
      * @param defaultValue The default value if the key is not found.
      * @return The retrieved {@link Transform2d} object.
      */
-    public static Transform2d retrieve(String TableName, String key, Transform2d defaultValue){
+    public static Transform2d retrieve(String tableName, String key, Transform2d defaultValue){
 
-        StructSubscriber<Transform2d> subscriber = tf2P.computeIfAbsent(fullPathOf(TableName, key), k ->
-            ntInstance.getTable(TableName).getStructTopic(key, Transform2d.struct).subscribe(defaultValue)
+        StructSubscriber<Transform2d> subscriber = tf2P.computeIfAbsent(fullPathOf(tableName, key), k ->
+            ntInstance.getTable(tableName).getStructTopic(key, Transform2d.struct).subscribe(defaultValue)
         );
 
         return subscriber.get();
@@ -1111,10 +1149,10 @@ public class NTPublisher{
      * @param defaultValue The default array if the key is not found.
      * @return The retrieved array of {@link Transform2d} objects.
      */
-    public static Transform2d[] retrieve(String TableName, String key, Transform2d[] defaultValue){
+    public static Transform2d[] retrieve(String tableName, String key, Transform2d[] defaultValue){
         
-        StructArraySubscriber<Transform2d> subscriber = atf2P.computeIfAbsent(fullPathOf(TableName, key), k ->
-            ntInstance.getTable(TableName).getStructArrayTopic(key, Transform2d.struct).subscribe(defaultValue)
+        StructArraySubscriber<Transform2d> subscriber = atf2P.computeIfAbsent(fullPathOf(tableName, key), k ->
+            ntInstance.getTable(tableName).getStructArrayTopic(key, Transform2d.struct).subscribe(defaultValue)
         );
 
         return subscriber.get();
@@ -1128,10 +1166,10 @@ public class NTPublisher{
      * @param defaultValue The default value if the key is not found.
      * @return The retrieved {@link Transform3d} object.
      */
-    public static Transform3d retrieve(String TableName, String key, Transform3d defaultValue){
+    public static Transform3d retrieve(String tableName, String key, Transform3d defaultValue){
         
-        StructSubscriber<Transform3d> subscriber = tf3P.computeIfAbsent(fullPathOf(TableName, key), k ->
-            ntInstance.getTable(TableName).getStructTopic(key, Transform3d.struct).subscribe(defaultValue)
+        StructSubscriber<Transform3d> subscriber = tf3P.computeIfAbsent(fullPathOf(tableName, key), k ->
+            ntInstance.getTable(tableName).getStructTopic(key, Transform3d.struct).subscribe(defaultValue)
         );
 
         return subscriber.get();
@@ -1145,10 +1183,10 @@ public class NTPublisher{
      * @param defaultValue The default array if the key is not found.
      * @return The retrieved array of {@link Transform3d} objects.
      */
-    public static Transform3d[] retrieve(String TableName, String key, Transform3d[] defaultValue){
+    public static Transform3d[] retrieve(String tableName, String key, Transform3d[] defaultValue){
         
-        StructArraySubscriber<Transform3d> subscriber = atf3P.computeIfAbsent(fullPathOf(TableName, key), k ->
-            ntInstance.getTable(TableName).getStructArrayTopic(key, Transform3d.struct).subscribe(defaultValue)
+        StructArraySubscriber<Transform3d> subscriber = atf3P.computeIfAbsent(fullPathOf(tableName, key), k ->
+            ntInstance.getTable(tableName).getStructArrayTopic(key, Transform3d.struct).subscribe(defaultValue)
         );
 
         return subscriber.get();
@@ -1162,10 +1200,10 @@ public class NTPublisher{
      * @param defaultValue The default value if the key is not found.
      * @return The retrieved {@link Rotation2d} object.
      */
-    public static Rotation2d retrieve(String TableName, String key, Rotation2d defaultValue){
+    public static Rotation2d retrieve(String tableName, String key, Rotation2d defaultValue){
 
-        StructSubscriber<Rotation2d> subscriber = r2P.computeIfAbsent(fullPathOf(TableName, key), k ->
-            ntInstance.getTable(TableName).getStructTopic(key, Rotation2d.struct).subscribe(defaultValue)
+        StructSubscriber<Rotation2d> subscriber = r2P.computeIfAbsent(fullPathOf(tableName, key), k ->
+            ntInstance.getTable(tableName).getStructTopic(key, Rotation2d.struct).subscribe(defaultValue)
         );
 
         return subscriber.get();
@@ -1179,10 +1217,10 @@ public class NTPublisher{
      * @param defaultValue The default array if the key is not found.
      * @return The retrieved array of {@link Rotation2d} objects.
      */
-    public static Rotation2d[] retrieve(String TableName, String key, Rotation2d[] defaultValue){
+    public static Rotation2d[] retrieve(String tableName, String key, Rotation2d[] defaultValue){
 
-        StructArraySubscriber<Rotation2d> subscriber = ar2P.computeIfAbsent(fullPathOf(TableName, key), k ->
-            ntInstance.getTable(TableName).getStructArrayTopic(key, Rotation2d.struct).subscribe(defaultValue)
+        StructArraySubscriber<Rotation2d> subscriber = ar2P.computeIfAbsent(fullPathOf(tableName, key), k ->
+            ntInstance.getTable(tableName).getStructArrayTopic(key, Rotation2d.struct).subscribe(defaultValue)
         );
 
         return subscriber.get();
@@ -1196,10 +1234,10 @@ public class NTPublisher{
      * @param defaultValue The default value if the key is not found.
      * @return The retrieved {@link Rotation3d} object.
      */
-    public static Rotation3d retrieve(String TableName, String key, Rotation3d defaultValue){
+    public static Rotation3d retrieve(String tableName, String key, Rotation3d defaultValue){
         
-        StructSubscriber<Rotation3d> subscriber = r3P.computeIfAbsent(fullPathOf(TableName, key), k ->
-            ntInstance.getTable(TableName).getStructTopic(key, Rotation3d.struct).subscribe(defaultValue)
+        StructSubscriber<Rotation3d> subscriber = r3P.computeIfAbsent(fullPathOf(tableName, key), k ->
+            ntInstance.getTable(tableName).getStructTopic(key, Rotation3d.struct).subscribe(defaultValue)
         );
 
         return subscriber.get();
@@ -1214,10 +1252,10 @@ public class NTPublisher{
      * @param defaultValue The default array if the key is not found.
      * @return The retrieved array of {@link Rotation3d} objects.
      */
-    public static Rotation3d[] retrieve(String TableName, String key, Rotation3d[] defaultValue){
+    public static Rotation3d[] retrieve(String tableName, String key, Rotation3d[] defaultValue){
         
-        StructArraySubscriber<Rotation3d> subscriber = ar3P.computeIfAbsent(fullPathOf(TableName, key), k ->
-            ntInstance.getTable(TableName).getStructArrayTopic(key, Rotation3d.struct).subscribe(defaultValue)
+        StructArraySubscriber<Rotation3d> subscriber = ar3P.computeIfAbsent(fullPathOf(tableName, key), k ->
+            ntInstance.getTable(tableName).getStructArrayTopic(key, Rotation3d.struct).subscribe(defaultValue)
         );
 
         return subscriber.get();
@@ -1232,10 +1270,10 @@ public class NTPublisher{
      * @param defaultValue The default value if the key is not found.
      * @return The retrieved {@link ChassisSpeeds} object.
      */
-    public static ChassisSpeeds retrieve(String TableName, String key, ChassisSpeeds defaultValue){
+    public static ChassisSpeeds retrieve(String tableName, String key, ChassisSpeeds defaultValue){
 
-        StructSubscriber<ChassisSpeeds> subscriber = cSP.computeIfAbsent(fullPathOf(TableName, key), k ->
-            ntInstance.getTable(TableName).getStructTopic(key, ChassisSpeeds.struct).subscribe(defaultValue)
+        StructSubscriber<ChassisSpeeds> subscriber = cSP.computeIfAbsent(fullPathOf(tableName, key), k ->
+            ntInstance.getTable(tableName).getStructTopic(key, ChassisSpeeds.struct).subscribe(defaultValue)
         );
 
         return subscriber.get();
@@ -1249,10 +1287,10 @@ public class NTPublisher{
      * @param defaultValue The default array if the key is not found.
      * @return The retrieved array of {@link ChassisSpeeds} objects.
      */
-    public static ChassisSpeeds[] retrieve(String TableName, String key, ChassisSpeeds[] defaultValue){
+    public static ChassisSpeeds[] retrieve(String tableName, String key, ChassisSpeeds[] defaultValue){
 
-        StructArraySubscriber<ChassisSpeeds> subscriber = acSP.computeIfAbsent(fullPathOf(TableName, key), k ->
-            ntInstance.getTable(TableName).getStructArrayTopic(key, ChassisSpeeds.struct).subscribe(defaultValue)
+        StructArraySubscriber<ChassisSpeeds> subscriber = acSP.computeIfAbsent(fullPathOf(tableName, key), k ->
+            ntInstance.getTable(tableName).getStructArrayTopic(key, ChassisSpeeds.struct).subscribe(defaultValue)
         );
 
         return subscriber.get();
@@ -1266,10 +1304,10 @@ public class NTPublisher{
      * @param defaultValue The default value if the key is not found.
      * @return The retrieved {@link SwerveModuleState} object.
      */
-    public static SwerveModuleState retrieve(String TableName, String key, SwerveModuleState defaultValue){
+    public static SwerveModuleState retrieve(String tableName, String key, SwerveModuleState defaultValue){
 
-        StructSubscriber<SwerveModuleState> subscriber = StateP.computeIfAbsent(fullPathOf(TableName, key), k ->
-            ntInstance.getTable(TableName).getStructTopic(key, SwerveModuleState.struct).subscribe(defaultValue)
+        StructSubscriber<SwerveModuleState> subscriber = StateP.computeIfAbsent(fullPathOf(tableName, key), k ->
+            ntInstance.getTable(tableName).getStructTopic(key, SwerveModuleState.struct).subscribe(defaultValue)
         );
 
         return subscriber.get();
@@ -1284,10 +1322,10 @@ public class NTPublisher{
      * @param defaultValue The default array if the key is not found.
      * @return The retrieved array of {@link SwerveModuleState} objects.
      */
-    public static SwerveModuleState[] retrieve(String TableName, String key, SwerveModuleState[] defaultValue){
+    public static SwerveModuleState[] retrieve(String tableName, String key, SwerveModuleState[] defaultValue){
         
-        StructArraySubscriber<SwerveModuleState> subscriber = aStateP.computeIfAbsent(fullPathOf(TableName, key), k ->
-            ntInstance.getTable(TableName).getStructArrayTopic(key, SwerveModuleState.struct).subscribe(defaultValue)
+        StructArraySubscriber<SwerveModuleState> subscriber = aStateP.computeIfAbsent(fullPathOf(tableName, key), k ->
+            ntInstance.getTable(tableName).getStructArrayTopic(key, SwerveModuleState.struct).subscribe(defaultValue)
         );
 
         return subscriber.get();
@@ -1302,10 +1340,10 @@ public class NTPublisher{
      * @param defaultValue The default value if the key is not found.
      * @return The retrieved {@link SwerveModulePosition} object.
      */
-    public static SwerveModulePosition retrieve(String TableName, String key, SwerveModulePosition defaultValue){
+    public static SwerveModulePosition retrieve(String tableName, String key, SwerveModulePosition defaultValue){
 
-        StructSubscriber<SwerveModulePosition> subscriber = PosP.computeIfAbsent(fullPathOf(TableName, key), k ->
-            ntInstance.getTable(TableName).getStructTopic(key, SwerveModulePosition.struct).subscribe(defaultValue)
+        StructSubscriber<SwerveModulePosition> subscriber = PosP.computeIfAbsent(fullPathOf(tableName, key), k ->
+            ntInstance.getTable(tableName).getStructTopic(key, SwerveModulePosition.struct).subscribe(defaultValue)
         );
 
         return subscriber.get();
@@ -1319,10 +1357,10 @@ public class NTPublisher{
      * @param defaultValue The default array if the key is not found.
      * @return The retrieved array of {@link SwerveModulePosition} objects.
      */
-    public static SwerveModulePosition[] retrieve(String TableName, String key, SwerveModulePosition[] defaultValue){
+    public static SwerveModulePosition[] retrieve(String tableName, String key, SwerveModulePosition[] defaultValue){
         
-        StructArraySubscriber<SwerveModulePosition> subscriber = aPosP.computeIfAbsent(fullPathOf(TableName, key), k ->
-            ntInstance.getTable(TableName).getStructArrayTopic(key, SwerveModulePosition.struct).subscribe(defaultValue)
+        StructArraySubscriber<SwerveModulePosition> subscriber = aPosP.computeIfAbsent(fullPathOf(tableName, key), k ->
+            ntInstance.getTable(tableName).getStructArrayTopic(key, SwerveModulePosition.struct).subscribe(defaultValue)
         );
 
         return subscriber.get();
@@ -1337,8 +1375,58 @@ public class NTPublisher{
      * @param defaultValue The default {@link Color} if the key is not found.
      * @return The retrieved {@link Color} object.
      */
-    public static Color retrieve(String TableName, String key, Color defaultValue){
-        return new Color(ntInstance.getTable(TableName).getEntry(key).getString(defaultValue.toHexString()));
-    } 
+    public static Color retrieve(String tableName, String key, Color defaultValue){
+        return new Color(ntInstance.getTable(tableName).getEntry(key).getString(defaultValue.toHexString()));
+    }
+
+    public static void clearForTable(String tableName) {
+
+        cSP.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        acSP.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        p3.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        ap3.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        p3P.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        ap3P.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        r2.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        ar2.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        r2P.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        ar2P.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        r3.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        ar3.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        r3P.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        ar3P.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        tf2.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        atf2.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        tf2P.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        atf2P.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        t2.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        at2.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        t2P.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        at2P.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        t3.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        at3.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        t3P.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        at3P.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        State.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        aState.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        StateP.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        aStateP.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        Pos.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        aPos.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        PosP.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        p2.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        sendables.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        tf3.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        tf3P.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        at3.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        at3P.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        aPosP.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        aStateP.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        p2P.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+        ap2P.keySet().removeIf(k -> k.startsWith(tableName + "/"));
+
+
+    }
+    
 
 }

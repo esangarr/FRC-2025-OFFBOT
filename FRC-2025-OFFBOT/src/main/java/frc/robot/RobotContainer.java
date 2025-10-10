@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import org.opencv.core.Mat;
-
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.filter.Debouncer;
@@ -20,10 +18,8 @@ import frc.robot.DriveCommands.DriveCommands;
 import frc.robot.DriveTrain.Swerve;
 import frc.robot.DriveTrain.Swerve.SwervePathConstraints;
 import frc.robot.DriveTrain.Vision;
-import frc.robot.MecaCommands.ClimberCommands.ClimberCommands;
 import frc.robot.MecaCommands.ElevatorCommands.ElevatorCommands;
 import frc.robot.MecaCommands.IntakeCommands.IntakeCommands;
-//import frc.robot.MecaCommands.IntakeCommands.IntakeCommands;
 import frc.robot.MecaCommands.OutakeCommands.OutakeCommands;
 import frc.robot.Mechanisms.Climber.ClimberSub;
 import frc.robot.Mechanisms.Elevator.ElevatorSub;
@@ -32,7 +28,6 @@ import frc.robot.Mechanisms.Intake.IntakeSub;
 import frc.robot.Mechanisms.Outake.OutakeSub;
 import lib.ForgePlus.NetworkTableUtils.NTPublisher;
 import lib.ForgePlus.NetworkTableUtils.NTSendableChooser;
-import lib.ForgePlus.NetworkTableUtils.NTTunnableNumber;
 import lib.ForgePlus.SwerveLib.Utils.Smoothjoystick;
 
 public class RobotContainer {
@@ -121,10 +116,10 @@ public class RobotContainer {
   
     operator.rightStick().whileTrue(ElevatorCommands.runManual(elevator, ()-> operator.getRightY()*0.15));
 
-    operator.a().whileTrue(ElevatorCommands.setPosUp(elevator, outake, index,  elevator.metersToRot(73.5), 70));
-    operator.x().whileTrue(ElevatorCommands.setPosUp(elevator, outake, index,  elevator.metersToRot(71.12), 120));
-    operator.b().whileTrue(ElevatorCommands.setPosUp(elevator, outake, index, elevator.metersToRot(111.76), 120));
-    operator.y().whileTrue(ElevatorCommands.setPosUp(elevator, outake, index, elevator.metersToRot(187), 100));
+    operator.a().toggleOnTrue(ElevatorCommands.setPosUp(elevator, outake, index,  elevator.metersToRot(73.5), 70));
+    operator.x().toggleOnTrue(ElevatorCommands.setPosUp(elevator, outake, index,  elevator.metersToRot(71.12), 120));
+    operator.b().toggleOnTrue(ElevatorCommands.setPosUp(elevator, outake, index, elevator.metersToRot(111.76), 120));
+    operator.y().toggleOnTrue(ElevatorCommands.setPosUp(elevator, outake, index, elevator.metersToRot(187), 100));
 
     operator.povDown().toggleOnTrue(ElevatorCommands.setPosDown(elevator, outake, elevator.metersToRot(80), 3));
 
@@ -134,7 +129,7 @@ public class RobotContainer {
     operator.povLeft().toggleOnTrue(OutakeCommands.AlgaeWheels(outake, 0.2543));
 
     operator.leftTrigger().whileTrue(OutakeCommands.moveWheels(outake, 0.6)); //Tragar
-    operator.rightTrigger().whileTrue(OutakeCommands.shoot(outake, -0.4)); //Disparar
+    operator.rightTrigger().whileTrue(OutakeCommands.shootDunk(outake, -0.4)); //Disparar
 
     operator.start().whileTrue(OutakeCommands.resetEncoder(outake));
     

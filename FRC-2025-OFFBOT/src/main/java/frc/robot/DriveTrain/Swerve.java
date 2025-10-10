@@ -7,9 +7,6 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
-import com.studica.frc.AHRS;
-import com.studica.frc.AHRS.NavXComType;
-
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -27,8 +24,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import lib.ForgePlus.Equals.Conditional;
-import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.Annotations.AutoNetworkPublisher;
-import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.Annotations.NetworkCommand;
 import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.NetworkSubsystem;
 import lib.ForgePlus.Sim.Annotations.RealDevice;
 import lib.ForgePlus.Sim.SimulatedSubsystem;
@@ -165,7 +160,7 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
             ()-> getRotation().getRadians()
         );
 
-        publishOutput("PoseFinder", pathFinder);
+        publish("PoseFinder", pathFinder);
 
     }
 
@@ -227,19 +222,19 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
     @Override
     public void NetworkPeriodic(){
 
-        publishOutput("Encoder 0 ", modules[0].getPosition());
-        publishOutput("Encoder 1 ", modules[1].getPosition());
-        publishOutput("Encoder 2 ", modules[2].getPosition());
-        publishOutput("Encoder 3 ", modules[3].getPosition());
+        publish("Encoder 0 ", modules[0].getPosition());
+        publish("Encoder 1 ", modules[1].getPosition());
+        publish("Encoder 2 ", modules[2].getPosition());
+        publish("Encoder 3 ", modules[3].getPosition());
 
-        publishOutput("Velocity 1", modules[0].getModuleVelocity());
-        publishOutput("Velocity 2", modules[1].getModuleVelocity());
-        publishOutput("Velocity 3", modules[2].getModuleVelocity());
-        publishOutput("Velocity 4", modules[3].getModuleVelocity());
+        publish("Velocity 1", modules[0].getModuleVelocity());
+        publish("Velocity 2", modules[1].getModuleVelocity());
+        publish("Velocity 3", modules[2].getModuleVelocity());
+        publish("Velocity 4", modules[3].getModuleVelocity());
 
-        publishOutput("ModuleStates", getModuleStates());
-        publishOutput("ModulePositions", getModulePositions());
-        publishOutput("ChassisSpeeds", getChassisSpeeds());
+        publish("ModuleStates", getModuleStates());
+        publish("ModulePositions", getModulePositions());
+        publish("ChassisSpeeds", getChassisSpeeds());
 
         for (var module : modules) {
             module.periodic();
@@ -290,8 +285,8 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
         
         estimator.update(rawGyroRotation, modulePositions);
 
-        publishOutput("Odometry/BotPose", estimator.getEstimatedPosition());
-        publishOutput("Odometry/QuestPose", nav.getPose());
+        publish("Odometry/BotPose", estimator.getEstimatedPosition());
+        publish("Odometry/QuestPose", nav.getPose());
         
 
     }
