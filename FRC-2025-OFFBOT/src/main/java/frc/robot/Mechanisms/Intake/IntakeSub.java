@@ -56,8 +56,8 @@ public class IntakeSub extends NetworkSubsystem{
         MechanismsConstants.IntakeConstants.AngulatorCurrentLimit,
         true);
         
-        pidUp.setTolerance(OutConstants.pidTolerance);
-        pidDown.setTolerance(OutConstants.pidTolerance);
+        pidUp.setTolerance(IntakeConstants.pidTolerance);
+        pidDown.setTolerance(IntakeConstants.pidTolerance);
 
         //Config Motor Ruedas
         IntConfigs = new TalonFXConfiguration();
@@ -72,9 +72,9 @@ public class IntakeSub extends NetworkSubsystem{
 
     @Override
     public void NetworkPeriodic(){
-        NTPublisher.publish("Angulo", getTableKey(), getPositionAng());
-        NTPublisher.publish("CurrentSetpoint", getTableKey(), currentSetpoint());
-        NTPublisher.publish("Atgoal", getTableKey(), atGoal());
+        publishOutput("Angulo", getPositionAng());
+        publishOutput("CurrentSetpoint", currentSetpoint());
+        publishOutput("Atgoal",  atGoal());
     }
 
     public double getPositionAng(){ 
@@ -120,7 +120,7 @@ public class IntakeSub extends NetworkSubsystem{
     }
 
     public boolean atGoal(){
-        return  (getPositionAng() - currentSetpoint()) <=  IntakeConstants.intakeTolerance;
+        return Math.abs(getPositionAng() - currentSetpoint()) <=  IntakeConstants.intakeTolerance;
     }
 
     //Obtener velocidad motorPID

@@ -3,23 +3,17 @@ package frc.robot.DriveTrain;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import lib.ForgePlus.Math.Profiles.Control.PIDControl;
-import lib.ForgePlus.Math.Profiles.ProfileGains.PIDGains;
+import lib.ForgePlus.   Math.Profiles.ProfileGains.PIDGains;
 import lib.ForgePlus.Math.Profiles.ProfileGains.SimpleFeedForwardGains;
 import lib.ForgePlus.REV.SparkMax.ForgeSparkMax;
-import lib.ForgePlus.Sim.Annotations.RealDevice;
-import lib.ForgePlus.Sim.Annotations.SimulatedDevice;
-import lib.ForgePlus.Sim.SimulatedSubsystem;
 
-public class SwerveModule implements SimulatedSubsystem{
+public class SwerveModule{
 
     public static final int driveCurrentLimit = 50;
     public static final int turnCurrentLimit = 20;
@@ -28,24 +22,11 @@ public class SwerveModule implements SimulatedSubsystem{
     public static final double driveMotorReduction = 5.36;
     public static final double turnMotorReduction =  18.75;
 
-    @RealDevice
     private ForgeSparkMax driveSparkMax;
-    @RealDevice
+  
     private ForgeSparkMax turnSparkMax;
-    @RealDevice
+  
     private CANcoder absoluteEncoder;
-
-    @SimulatedDevice
-    private DCMotorSim driveSim =
-    new DCMotorSim(
-        LinearSystemId.createDCMotorSystem(NEOGearbox, 0.025, driveMotorReduction),
-        NEOGearbox);
-    
-    @SimulatedDevice
-    private DCMotorSim turnSim =
-    new DCMotorSim(
-        LinearSystemId.createDCMotorSystem(NEOGearbox, 0.004, turnMotorReduction),
-        NEOGearbox);
 
     private final PIDControl drivePID;
     private final PIDControl turnPID;
@@ -74,34 +55,26 @@ public class SwerveModule implements SimulatedSubsystem{
     public SwerveModule(int index){
    
         //Use real Configuration
-        if (!isInSimulation()) {
-            this.turnPIDGains = new PIDGains(5.0, 0,0);
-            this.drivePIDGains = new PIDGains(0.05, 0, 0);
-            this.driveFFGains = new SimpleFeedForwardGains(0.1, 0.04, 0);
+     
+            this.turnPIDGains = new PIDGains(2.5, 0,0.0001);
+
+            this.drivePIDGains = new PIDGains(1.25, 0, 0);
+            this.driveFFGains = new SimpleFeedForwardGains(0.35, 1.7, 0);
             
             createSparks(index);
 
-        }else{
-        //Use sim Configuration
-            this.turnPIDGains = new PIDGains(8.0, 0,0);
-            this.drivePIDGains = new PIDGains(0.05, 0, 0);
-            this.driveFFGains = new SimpleFeedForwardGains(0, 0.0789, 0);
-
-            
-        }
 
         drivePID = new PIDControl(drivePIDGains);
         turnPID = new PIDControl(turnPIDGains);
 
         turnPID.continuousInput(-Math.PI, Math.PI);
 
-        initializeSubsystemDevices();
 
     }
 
     //Main Loop
     public void periodic(){
-        handleSubsystemRealityLoop();
+        RealDevicesPeriodic();
 
         if (angleSetpoint != null) {
             this.turnVoltage = turnPID.calculate(moduleAngle.getRadians()).getOutput();
@@ -116,20 +89,6 @@ public class SwerveModule implements SimulatedSubsystem{
         }
     }
 
-    @Override
-    public void SimulationDevicesPeriodic(){
-
-        this.moduleAngle = new Rotation2d(turnSim.getAngularPositionRad());
-        this.driveVelocity = driveSim.getAngularVelocityRadPerSec();
-
-        driveSim.setInputVoltage(MathUtil.clamp(driveVoltage, -12.0, 12.0));
-        turnSim.setInputVoltage(MathUtil.clamp(turnVoltage, -12.0, 12.0));
-
-        driveSim.update(0.02);
-        turnSim.update(0.02);
-    }
-
-    @Override
     public void RealDevicesPeriodic(){
 
         this.moduleAngle = 
@@ -141,6 +100,7 @@ public class SwerveModule implements SimulatedSubsystem{
 
         driveSparkMax.setVoltage(driveVoltage);
         turnSparkMax.setVoltage(turnVoltage);
+
 
     }
 
@@ -181,7 +141,7 @@ public class SwerveModule implements SimulatedSubsystem{
 
     public double getDrivePositionMeters(){
 
-        double position = isInSimulation() ? driveSim.getAngularPositionRad() : driveSparkMax.getPosition().toRadians().getRead() / driveMotorReduction;
+        double position = driveSparkMax.getPosition().toRadians().getRead() / driveMotorReduction;
 
         return position * WHEELRADIUS;
       }
@@ -199,7 +159,7 @@ public class SwerveModule implements SimulatedSubsystem{
         speedSetpoint = desiredState.speedMetersPerSecond;
 
         setTurnPos(angleSetpoint);
-        setDriveVelocity(speedSetpoint / WHEELRADIUS);
+        setDriveVelocity(speedSetpoint/ WHEELRADIUS);
 
     }
 

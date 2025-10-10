@@ -93,21 +93,15 @@ public class IntakeCommands {
                     intake.stopWheelsIntake();
                     intake.setPositionUp(angleUp);
 
-                }).until(()-> DomainUtils.inRange(intake.getPositionAng(), angleUp - 2, angleUp + 2))
+                })
 
-                .andThen(Commands.run(()-> {
-                    System.out.println("Paso 5");
-                    elevator.setPosition(-elevator.metersToRot(63), RequestType.kDown);
-                    outake.runWheelsOutake(0.6);
-                })).withTimeout(3))
-                
                 .finallyDo(()->{
                     System.out.println("Final");
                     elevator.setPosition(-elevator.metersToRot(80), RequestType.kUP);
                     intake.stopAll(); 
                     index.stop();
                     outake.stopALL();
-                   ;});
+                   ;}));
                     
         }
 

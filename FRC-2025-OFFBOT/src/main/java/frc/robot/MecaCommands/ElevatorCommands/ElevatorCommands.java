@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Mechanisms.Elevator.ElevatorSub;
 import frc.robot.Mechanisms.Elevator.ElevatorSub.RequestType;
+import frc.robot.Mechanisms.Indexer.IndexerSub;
 import frc.robot.Mechanisms.Outake.OutakeSub;
 
 public class ElevatorCommands {
@@ -20,13 +21,27 @@ public class ElevatorCommands {
         return Commands.run(()->{ Elev.setVoltage(voltage);}, Elev).finallyDo(()->{Elev.StopMotors();});
     }
 
-    public static Command setPosUp(ElevatorSub Elev, OutakeSub outake, double setpoint, double targetOutake){
+    public static Command setPosUp(
+        ElevatorSub Elev, 
+        OutakeSub outake,
+        IndexerSub index,
+        double setpoint,
+        double targetOutake){
 
         return Commands.run(()->{ 
+            Elev.setPosition(-Elev.metersToRot(63), RequestType.kDown);
+            outake.setPositionDown(2);
+            outake.runWheelsOutake(0.6);
+        },Elev, outake, index).until(()-> !index.hasPiece())
+       
+        .andThen(Commands.run(()-> {
+            outake.stopwheelsOutake();
             Elev.setPosition(-setpoint, RequestType.kUP);
-            outake.setPositionUp(targetOutake);
-            
-        },Elev, outake).finallyDo(()->{Elev.StopMotors();});
+        }, Elev, outake, index))
+        
+        .finallyDo(()->{
+            Elev.StopMotors();
+        });
 
     }
 

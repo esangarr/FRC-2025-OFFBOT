@@ -1,7 +1,13 @@
 package frc.robot.DriveCommands;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+
+import com.ctre.phoenix6.swerve.jni.SwerveJNI.ModulePosition;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -9,6 +15,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.DriveTrain.Swerve;
@@ -24,6 +32,28 @@ public class DriveCommands {
     private static final double DEADBAND = 0.1;
 
     private DriveCommands() {}
+
+    public static Command setTurnAngle( Swerve drive, Rotation2d angle){
+
+        return Commands.run(()-> {
+            drive.modules[0].setTurnPos(angle);
+            drive.modules[1].setTurnPos(angle);
+            drive.modules[2].setTurnPos(angle);
+            drive.modules[3].setTurnPos(angle);
+        }, drive);
+
+    }
+
+    public static Command setVelocity(Swerve drive, double velocity){
+        return Commands.run(()-> {
+            drive.modules[0].setDriveVelocity(velocity);
+            drive.modules[1].setDriveVelocity(velocity);
+            drive.modules[2].setDriveVelocity(velocity);
+            drive.modules[3].setDriveVelocity(velocity);
+        });
+    }
+
+    
 
     public static Translation2d getLinearVelocityFromJoysticks(double x, double y) {
         // Apply deadband
@@ -128,14 +158,77 @@ public class DriveCommands {
         }, drive);
      }
 
-  public static Command moveInY(Swerve drive, double speed){
-    return Commands.run(()-> {
-        drive.runVelocity(new ChassisSpeeds(speed,0, 0));}, drive);
+    public static Command moveInY(Swerve drive, double speed){
+        return Commands.run(()-> {
+            drive.runVelocity(new ChassisSpeeds(speed,0, 0));}, drive);
     }   
 
     public static Command resetHeading(Swerve drive){
         return Commands.runOnce(()-> {drive.resetHeading();});
     }
+
+    private static final double FF_START_DELAY = 2.0; 
+    private static final double FF_RAMP_RATE = 0.1;
+
+    public static Command feedforwardCharacterization(Swerve drive) {
+        List<Double> velocitySamples = new LinkedList<>();
+        List<Double> voltageSamples = new LinkedList<>();
+        Timer timer = new Timer();
+
+        return Commands.sequence(
+            // Reset data
+            Commands.runOnce(
+                () -> {
+                velocitySamples.clear();
+                voltageSamples.clear();
+              }),
+
+             // Allow modules to orient
+            Commands.run(
+                    () -> {
+                    drive.runCharacterization(0.0);
+                    },
+                    drive)
+                .withTimeout(FF_START_DELAY),
+
+            // Start timer
+            Commands.runOnce(timer::restart),
+
+            // Accelerate and gather data
+            Commands.run(
+                    () -> {
+                    double voltage = timer.get() * FF_RAMP_RATE;
+                    drive.runCharacterization(voltage);
+                    velocitySamples.add(drive.getFFCharacterizationVelocity());
+                    voltageSamples.add(voltage);
+                    },
+                    drive)
+
+                // When cancelled, calculate and print results
+                .finallyDo(
+                    () -> {
+                    int n = velocitySamples.size();
+                    double sumX = 0.0;
+                    double sumY = 0.0;
+                    double sumXY = 0.0;
+                    double sumX2 = 0.0;
+                        for (int i = 0; i < n; i++) {
+                            sumX += velocitySamples.get(i);
+                            sumY += voltageSamples.get(i);
+                            sumXY += velocitySamples.get(i) * voltageSamples.get(i);
+                            sumX2 += velocitySamples.get(i) * velocitySamples.get(i);
+                    }
+                  double kS = (sumY * sumX2 - sumX * sumXY) / (n * sumX2 - sumX * sumX);
+                  double kV = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+
+                  NumberFormat formatter = new DecimalFormat("#0.00000");
+                  System.out.println("********** Drive FF Characterization Results **********");
+                  System.out.println("\tkS: " + formatter.format(kS));
+                  SmartDashboard.putString("ks", formatter.format(kS));
+                  System.out.println("\tkV: " + formatter.format(kV));
+                  SmartDashboard.putString("kV", formatter.format(kV));
+                }));
+  }
 
 
 

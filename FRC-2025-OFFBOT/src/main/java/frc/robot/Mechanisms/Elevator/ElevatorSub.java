@@ -15,7 +15,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj.Encoder;
 import frc.robot.Mechanisms.MechanismsConstants.ElevatorConstants;
-
+import frc.robot.Mechanisms.MechanismsConstants.IntakeConstants;
 import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.NetworkSubsystem;
 
 public class ElevatorSub extends NetworkSubsystem{
@@ -110,7 +110,13 @@ public class ElevatorSub extends NetworkSubsystem{
         slot1Configs.kI = 0; // no output for integrated error
         slot1Configs.kD = 0.001 ; // A velocity error of 1 rps results in 0.1 V output
     
+        var limitConfigs = new CurrentLimitsConfigs();
 
+        limitConfigs.StatorCurrentLimit = 60;
+        limitConfigs.StatorCurrentLimitEnable = true;
+        
+        leader.getConfigurator().apply(limitConfigs);
+        follower.getConfigurator().apply(limitConfigs);
 
         leader.getConfigurator().apply(talonFXConfigs);
         follower.getConfigurator().apply(talonFXConfigs);
@@ -130,14 +136,25 @@ public class ElevatorSub extends NetworkSubsystem{
             leader.setControl(leader_request.withPosition(position).withSlot(1));
         }
 
-        
+    }
 
+    public double getSetpoint(){
+        return RotationsToMeters(leader.getClosedLoopReference().getValueAsDouble());
+    }
+
+    public boolean atGoal(){
+        return Math.abs(getMeters() - getSetpoint()) <=  4;
     }
 
 
     public double getMeters(){
         double gamma = ((124.5/42));
         return gamma * -rotorPosRotations + 63.5;
+    }
+
+    public double RotationsToMeters(double rotations){
+        double gamma = ((124.5/42));
+        return gamma * -rotations + 63.5;
     }
 
     public double metersToRot(double meters){
@@ -171,10 +188,9 @@ public class ElevatorSub extends NetworkSubsystem{
         updatePosition();
 
        publishOutput("Rotor/Rotations", rotorPosRotations);
-       publishOutput("Rotor/Latency", rotorPosLatency);
-       publishOutput("metros", getMeters());
+       publishOutput("Rotor/metros", getMeters());
        publishOutput("Rotor/inverse", metersToRot(getMeters()));
-
+       publishOutput("Rotor/ElevatorSetpoint", getSetpoint());
 
     }
     }

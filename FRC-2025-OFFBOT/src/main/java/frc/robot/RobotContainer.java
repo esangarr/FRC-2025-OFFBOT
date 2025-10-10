@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import org.opencv.core.Mat;
+
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.filter.Debouncer;
@@ -90,22 +92,30 @@ public class RobotContainer {
   private void configureBindings() {
 
     //---------------------------------------------------------------- DRIVER ----------------------------------------------------------------
-
     chassis.setDefaultCommand(DriveCommands.joystickDrive(
       chassis,
-      smooth.filter(()-> -driver.getLeftY() * 0.9),
-      smooth.filter(()-> -driver.getLeftX() * 0.9),
-      smooth.filter(()-> -driver.getRightX() * 0.8)));
+      smooth.filter(()-> -driver.getLeftY() * 0.7),
+      smooth.filter(()-> -driver.getLeftX() * 0.7),
+      smooth.filter(()-> -driver.getRightX() * 0.6)));
     
     chassis.setDefaultCommand(DriveCommands.joystickDrive(chassis, ()-> driver.getLeftY(), ()-> driver.getLeftX(), ()-> -driver.getRightX()));
 
-    driver.a().whileTrue(chassis.getPathFinder().toPoseCommand(new Pose2d(3.19,4.03, Rotation2d.kZero)));
-    driver.y().whileTrue(DriveCommands.resetHeading(chassis));
+    
+    driver.rightBumper().whileTrue(DriveCommands.setTurnAngle(chassis, Rotation2d.fromRadians(3.1416)));
+    driver.leftBumper().whileTrue(DriveCommands.setVelocity(chassis, 1));
+
+    driver.x().whileTrue(chassis.getPathFinder().toPoseCommand(new Pose2d(3.19,4.03, Rotation2d.kZero)));
+    driver.b().whileTrue(DriveCommands.resetHeading(chassis));
 
     driver.povLeft().whileTrue(DriveCommands.moveInX(chassis, 0.6));
     driver.povRight().whileTrue(DriveCommands.moveInX(chassis, -0.6));
     driver.povUp().whileTrue(DriveCommands.moveInY(chassis, 0.6));
     driver.povDown().whileTrue(DriveCommands.moveInY(chassis,-0.6));
+
+    driver.start().whileTrue(DriveCommands.resetHeading(chassis));
+
+    driver.y().toggleOnTrue(IntakeCommands.setAngleUp(intake, 35)); // Cambiar a Driver
+    driver.a().whileTrue(IntakeCommands.setAngleDown(intake, 200)); // Cambiar a Driver
 
     //---------------------------------------------------------------- DRIVER ----------------------------------------------------------------
 
@@ -113,25 +123,22 @@ public class RobotContainer {
   
     operator.rightStick().whileTrue(ElevatorCommands.runManual(elevator, ()-> operator.getRightY()*0.15));
 
-    operator.a().whileTrue(ElevatorCommands.setPosUp(elevator, outake, elevator.metersToRot(73.5), 70));
-    operator.x().whileTrue(ElevatorCommands.setPosUp(elevator, outake, elevator.metersToRot(71.12), 120));
-    operator.b().whileTrue(ElevatorCommands.setPosUp(elevator, outake, elevator.metersToRot(111.76), 120));
-    operator.y().whileTrue(ElevatorCommands.setPosUp(elevator, outake, elevator.metersToRot(187), 100));
+    operator.a().whileTrue(ElevatorCommands.setPosUp(elevator, outake, index,  elevator.metersToRot(73.5), 70));
+    operator.x().whileTrue(ElevatorCommands.setPosUp(elevator, outake, index,  elevator.metersToRot(71.12), 120));
+    operator.b().whileTrue(ElevatorCommands.setPosUp(elevator, outake, index, elevator.metersToRot(111.76), 120));
+    operator.y().whileTrue(ElevatorCommands.setPosUp(elevator, outake, index, elevator.metersToRot(187), 100));
 
-    operator.povDown().whileTrue(ElevatorCommands.setPosDown(elevator, outake, elevator.metersToRot(80), 3));
+    operator.povDown().toggleOnTrue(ElevatorCommands.setPosDown(elevator, outake, elevator.metersToRot(80), 3));
 
     operator.leftBumper().whileTrue(IntakeCommands.outPiece(intake, index, 0.9, 35, 0.5 ));
     operator.rightBumper().whileTrue(IntakeCommands.clearPiece(intake, index, elevator, outake, 0.9, 0.25, 0.25 , timerOut, 35, 200));
     
+    operator.povLeft().toggleOnTrue(OutakeCommands.AlgaeWheels(outake, 0.2543));
 
-    operator.povRight().toggleOnTrue(IntakeCommands.setAngleUp(intake, 35)); // Cambiar a Driver
-    operator.povLeft().whileTrue(IntakeCommands.setAngleDown(intake, 200)); // Cambiar a Driver
-
-    operator.leftTrigger().whileTrue(OutakeCommands.outWheels(outake, 0.6)); //Tragar
-    operator.rightTrigger().whileTrue(OutakeCommands.outWheels(outake, -0.2)); //Disparar
+    operator.leftTrigger().whileTrue(OutakeCommands.moveWheels(outake, 0.6)); //Tragar
+    operator.rightTrigger().whileTrue(OutakeCommands.shoot(outake, -0.4)); //Disparar
 
     operator.start().whileTrue(OutakeCommands.resetEncoder(outake));
-
     
     
 

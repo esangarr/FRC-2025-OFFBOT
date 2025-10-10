@@ -46,7 +46,7 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
 
     private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleLocations());
 
-    private SwerveModulePosition[] lastModulePositions =
+    public SwerveModulePosition[] lastModulePositions =
       new SwerveModulePosition[] {
         new SwerveModulePosition(),
         new SwerveModulePosition(),
@@ -61,7 +61,7 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
     
     private final PoseFinder pathFinder;
 
-    private SwerveModule[] modules = new SwerveModule[4];
+    public SwerveModule[] modules = new SwerveModule[4];
 
     private final SwerveDrivePoseEstimator estimator = new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
 
@@ -209,7 +209,7 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
 
         var yawLatency = angleSignal.getTimestamp().getLatency();
 
-        angleSignal.waitForUpdate(0.020);
+
 
         return anglePos;
 
@@ -226,6 +226,20 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
     
     @Override
     public void NetworkPeriodic(){
+
+        publishOutput("Encoder 0 ", modules[0].getPosition());
+        publishOutput("Encoder 1 ", modules[1].getPosition());
+        publishOutput("Encoder 2 ", modules[2].getPosition());
+        publishOutput("Encoder 3 ", modules[3].getPosition());
+
+        publishOutput("Velocity 1", modules[0].getModuleVelocity());
+        publishOutput("Velocity 2", modules[1].getModuleVelocity());
+        publishOutput("Velocity 3", modules[2].getModuleVelocity());
+        publishOutput("Velocity 4", modules[3].getModuleVelocity());
+
+        publishOutput("ModuleStates", getModuleStates());
+        publishOutput("ModulePositions", getModulePositions());
+        publishOutput("ChassisSpeeds", getChassisSpeeds());
 
         for (var module : modules) {
             module.periodic();
@@ -324,7 +338,7 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
           output += modules[i].getFFCharacterizationVelocity() / 4.0;
         }
         return output;
-      }
+    }
 
     public void stop(){
         runVelocity(new ChassisSpeeds());

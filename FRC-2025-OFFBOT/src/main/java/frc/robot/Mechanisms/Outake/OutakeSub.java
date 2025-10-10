@@ -8,6 +8,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Mechanisms.MechanismsConstants.OutConstants;
 import lib.ForgePlus.Math.Profiles.Control.PIDControl;
@@ -58,12 +59,14 @@ public class OutakeSub extends NetworkSubsystem{
 
     @Override
     public void NetworkPeriodic(){
-        SmartDashboard.putNumber("angleoutake", relEncoder.getPosition());
+        publishOutput("angleoutake", getPosition());
+        publishOutput("CurrentSetpoint", currentSetpoint());
     }
 
     public double getPosition(){ 
         return (relEncoder.getPosition() / 66.666) * 360;
     }
+
     
     public void resetEconder(){
         relEncoder.setPosition(0);

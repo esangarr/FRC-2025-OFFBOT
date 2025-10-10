@@ -18,7 +18,8 @@ public class OutakeCommands {
 
         return Commands.run(()-> {
             outake.setPositionUp(angle);
-        },outake).finallyDo(()->{
+        },outake)
+        .finallyDo(()->{
             outake.stopArm();
         });
     }
@@ -38,10 +39,27 @@ public class OutakeCommands {
         }, outake );
     }
 
-    public static Command outWheels(OutakeSub outake, double speed){
+    public static Command moveWheels(OutakeSub outake, double speed){
         return Commands.run(()-> {
             outake.runWheelsOutake(speed);
         }, outake ).finallyDo(()-> {outake.stopwheelsOutake();});
+    }
+
+    public static Command shoot(OutakeSub outake, double speed){
+        return Commands.run(()-> {
+            outake.runWheelsOutake(speed);
+        }, outake ).finallyDo(()-> {outake.stopALL();});
+    }
+
+
+
+    public static Command AlgaeWheels(OutakeSub outake, double speed){
+        return Commands.sequence(
+            Commands.run(() -> outake.runWheelsOutake(speed), outake).withTimeout(0.1),
+            Commands.run(() -> outake.stopwheelsOutake(), outake).withTimeout(0.1)
+        ).repeatedly().finallyDo(()-> {outake.stopwheelsOutake();});
+
+    
     }
 
 

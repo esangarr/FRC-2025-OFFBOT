@@ -41,7 +41,7 @@ public class MechanismsConstants {
         public final static int AngulatorCurrentLimit = 0;
         public final static int IntWheelsCurrentLimit = 25;
 
-        public final static double pidTolerance = 3;
+        public final static double pidTolerance = 0;
 
         public final static double GaerRatio = 17.9;
 
@@ -76,7 +76,7 @@ public class MechanismsConstants {
     
         public final static double pidTolerance = 1;
 
-        public static final PIDGains pidGainsUp = new PIDGains(0.019, 0, 0);
+        public static final PIDGains pidGainsUp = new PIDGains(0.017, 0, 0);
         public static final PIDGains pidGainsDown = new PIDGains(0.0075, 0, 0);
     
     }

@@ -44,7 +44,7 @@ public class IndexerSub extends NetworkSubsystem{
 
     @Override
     public void NetworkPeriodic(){
-        NTPublisher.publish("Has Piece", getTableKey(), hasPiece());
+        publishOutput("Has Piece", hasPiece());
      }
 
     public void runWheels(double speedRight, double speedLeft){
