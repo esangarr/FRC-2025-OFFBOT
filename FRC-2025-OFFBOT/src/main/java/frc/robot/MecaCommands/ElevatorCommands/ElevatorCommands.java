@@ -21,7 +21,7 @@ public class ElevatorCommands {
         return Commands.run(()->{ Elev.setVoltage(voltage);}, Elev).finallyDo(()->{Elev.StopMotors();});
     }
 
-    public static Command setPosUp(
+    public static Command scoreCoral(
         ElevatorSub Elev, 
         OutakeSub outake,
         IndexerSub index,
@@ -34,7 +34,7 @@ public class ElevatorCommands {
             outake.setPositionDown(1);
 
         },Elev, outake, index)
-        .until(()-> index.noPiece() || outake.getCurrent() >= 29)
+        .until(()-> !index.hasPiece() )
 
         .andThen(
             Commands.sequence(
@@ -53,6 +53,54 @@ public class ElevatorCommands {
 
     }
 
+    public static Command GetAlgae(
+        ElevatorSub Elev, 
+        OutakeSub outake,
+        double setpoint,
+        double targetOutake, 
+        double speed){
+
+        return Commands.run(()->{ 
+
+            Elev.setPosition(-setpoint, RequestType.kUP);
+
+        },Elev, outake).until(()-> Elev.atGoal())
+
+            
+            .andThen(Commands.parallel(
+                Commands.run(()-> {outake.setPositionUp(targetOutake);}),
+                Commands.sequence(
+                    Commands.run(() -> outake.runWheelsOutake(speed), outake).withTimeout(0.1),
+                    Commands.run(() -> outake.stopwheelsOutake(), outake).withTimeout(0.1)).repeatedly()));
+
+        
+
+    }
+
+    public static Command SetAlgae(
+        ElevatorSub Elev, 
+        OutakeSub outake,
+        double setpoint,
+        double targetOutake, 
+        double speed){
+
+        return Commands.run(()->{ 
+
+            Elev.setPosition(-setpoint, RequestType.kUP);
+
+        },Elev, outake).until(()-> Elev.atGoal())
+
+            
+            .andThen(Commands.parallel(
+                Commands.run(()-> {outake.setPositionAlgae(targetOutake);}),
+                Commands.sequence(
+                    Commands.run(() -> outake.runWheelsOutake(speed), outake).withTimeout(0.1),
+                    Commands.run(() -> outake.stopwheelsOutake(), outake).withTimeout(0.1)).repeatedly()));
+
+        
+
+    }
+
     public static Command setPosDown(ElevatorSub Elev, OutakeSub outake, double setpoint, double targetOutake){
 
         return Commands.run(()->{ 
@@ -64,6 +112,7 @@ public class ElevatorCommands {
             });
 
     }
+
 
 
 

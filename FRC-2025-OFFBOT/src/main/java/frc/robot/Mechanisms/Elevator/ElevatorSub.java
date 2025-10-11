@@ -10,6 +10,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Mechanisms.MechanismsConstants.ElevatorConstants;
 import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.NetworkSubsystem;
 
@@ -78,7 +79,7 @@ public class ElevatorSub extends NetworkSubsystem{
 
         rotorPosLatency = rotorPosSignal.getTimestamp().getLatency();
 
-        rotorPosSignal.waitForUpdate(0.020);
+
     }
 
     public void configMotion(){
@@ -182,11 +183,20 @@ public class ElevatorSub extends NetworkSubsystem{
     public void NetworkPeriodic() {
         updatePosition();
 
+    /* 
        publish("Rotor/Rotations", rotorPosRotations);
        publish("Rotor/Altura cm", getMeters());
        publish("Rotor/inverse", metersToRot(getMeters()));
        publish("Rotor/ElevatorSetpoint", getSetpoint());
-       publish("Rotor/ElevatorAtGoal", atGoal());
+       publish("Rotor/ElevatorAtGoal", atGoal());*/
+
+       SmartDashboard.putNumber("Rotor/Rotations", rotorPosRotations);
+       SmartDashboard.putNumber("Rotor/Altura cm", getMeters());
+       SmartDashboard.putNumber("Rotor/inverse", metersToRot(getMeters()));
+       SmartDashboard.putNumber("Rotor/ElevatorSetpoint", getSetpoint());
+       SmartDashboard.putBoolean("Rotor/ElevatorAtGoal", atGoal());
+
+       
 
     }
     }

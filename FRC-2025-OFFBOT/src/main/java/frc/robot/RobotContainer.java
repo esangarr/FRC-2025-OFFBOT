@@ -18,6 +18,7 @@ import frc.robot.DriveCommands.DriveCommands;
 import frc.robot.DriveTrain.Swerve;
 import frc.robot.DriveTrain.Swerve.SwervePathConstraints;
 import frc.robot.DriveTrain.Vision;
+import frc.robot.MecaCommands.ClimberCommands.ClimberCommands;
 import frc.robot.MecaCommands.ElevatorCommands.ElevatorCommands;
 import frc.robot.MecaCommands.IntakeCommands.IntakeCommands;
 import frc.robot.MecaCommands.OutakeCommands.OutakeCommands;
@@ -90,22 +91,22 @@ public class RobotContainer {
     //---------------------------------------------------------------- DRIVER ----------------------------------------------------------------
     chassis.setDefaultCommand(DriveCommands.joystickDrive(
       chassis,
-      smooth.filter(()-> -driver.getLeftY() * 0.7),
-      smooth.filter(()-> -driver.getLeftX() * 0.7),
-      smooth.filter(()-> -driver.getRightX() * 0.6)));
+      smooth.filter(()-> -driver.getLeftY() * 0.6),
+      smooth.filter(()-> -driver.getLeftX() * 0.6),
+      smooth.filter(()-> -driver.getRightX() * 0.5)));
    
-    driver.rightBumper().whileTrue(DriveCommands.setTurnAngle(chassis, Rotation2d.fromRadians(3.1416)));
-    driver.leftBumper().whileTrue(DriveCommands.setVelocity(chassis, 1));
+    driver.rightBumper().whileTrue(ClimberCommands.angleClimber(climber, 0.5));
+    driver.leftBumper().whileTrue(ClimberCommands.angleClimber(climber, -0.5));
+
+    driver.leftTrigger().whileTrue(ClimberCommands.climberWheels(climber, 1));
 
     driver.x().whileTrue(chassis.getPathFinder().toPoseCommand(new Pose2d(3.19,4.03, Rotation2d.kZero)));
     driver.b().whileTrue(DriveCommands.resetHeading(chassis));
 
-    driver.povLeft().whileTrue(DriveCommands.moveInX(chassis, 0.6));
-    driver.povRight().whileTrue(DriveCommands.moveInX(chassis, -0.6));
-    driver.povUp().whileTrue(DriveCommands.moveInY(chassis, 0.6));
-    driver.povDown().whileTrue(DriveCommands.moveInY(chassis,-0.6));
-
-    driver.start().whileTrue(DriveCommands.resetHeading(chassis));
+    driver.povLeft().whileTrue(DriveCommands.moveInX(chassis, -0.6));
+    driver.povRight().whileTrue(DriveCommands.moveInX(chassis, 0.6));
+    driver.povUp().whileTrue(DriveCommands.moveInY(chassis, -0.6));
+    driver.povDown().whileTrue(DriveCommands.moveInY(chassis,0.6));
 
     driver.y().toggleOnTrue(IntakeCommands.setAngleUp(intake, 35)); // Cambiar a Driver
     driver.a().whileTrue(IntakeCommands.setAngleDown(intake, 200)); // Cambiar a Driver
@@ -114,26 +115,26 @@ public class RobotContainer {
 
     //---------------------------------------------------------------- OPERATOR ----------------------------------------------------------------
   
-    operator.rightStick().whileTrue(ElevatorCommands.runManual(elevator, ()-> operator.getRightY()*0.15));
+    operator.a().toggleOnTrue(ElevatorCommands.scoreCoral(elevator, outake, index,  elevator.metersToRot(73.5), 70));
+    operator.x().toggleOnTrue(ElevatorCommands.scoreCoral(elevator, outake, index,  elevator.metersToRot(71.12), 120));
+    operator.b().toggleOnTrue(ElevatorCommands.scoreCoral(elevator, outake, index, elevator.metersToRot(111.76), 120));
+    operator.y().toggleOnTrue(ElevatorCommands.scoreCoral(elevator, outake, index, elevator.metersToRot(187), 100));
+    operator.povDown().toggleOnTrue(ElevatorCommands.setPosDown(elevator, outake, elevator.metersToRot(80), 1.8));
 
-    operator.a().toggleOnTrue(ElevatorCommands.setPosUp(elevator, outake, index,  elevator.metersToRot(73.5), 70));
-    operator.x().toggleOnTrue(ElevatorCommands.setPosUp(elevator, outake, index,  elevator.metersToRot(71.12), 120));
-    operator.b().toggleOnTrue(ElevatorCommands.setPosUp(elevator, outake, index, elevator.metersToRot(111.76), 120));
-    operator.y().toggleOnTrue(ElevatorCommands.setPosUp(elevator, outake, index, elevator.metersToRot(187), 100));
 
-    operator.povDown().toggleOnTrue(ElevatorCommands.setPosDown(elevator, outake, elevator.metersToRot(80), 3));
+    operator.povLeft().toggleOnTrue(ElevatorCommands.GetAlgae(elevator, outake, elevator.metersToRot(95), 90, 0.2));
+    operator.povRight().toggleOnTrue(ElevatorCommands.GetAlgae(elevator, outake, elevator.metersToRot(120), 80, 0.2));
+
+    operator.leftStick().toggleOnTrue(ElevatorCommands.SetAlgae(elevator, outake, elevator.metersToRot(80), 130, 0.2));
+    operator.povUp().toggleOnTrue(ElevatorCommands.SetAlgae(elevator, outake, elevator.metersToRot(187), 130, 0.2));
+
 
     operator.leftBumper().whileTrue(IntakeCommands.outPiece(intake, index, 0.9, 35, 0.5 ));
-    operator.rightBumper().whileTrue(IntakeCommands.clearPiece(intake, index, elevator, outake, 0.9, 0.25, 0.25 , timerOut, 35, 200));
-    
-    operator.povLeft().toggleOnTrue(OutakeCommands.AlgaeWheels(outake, 0.2543));
+    operator.rightBumper().whileTrue(IntakeCommands.clearPiece(intake, index, elevator, outake, 0.9, 0.38, 0.38 , timerOut, 35, 200));
 
-    operator.leftTrigger().whileTrue(OutakeCommands.moveWheels(outake, 0.6)); //Tragar
-    operator.rightTrigger().whileTrue(OutakeCommands.shootDunk(outake, -0.4)); //Disparar
-
+    operator.leftTrigger().whileTrue(OutakeCommands.moveWheels(outake, -0.8));
+    operator.rightTrigger().whileTrue(OutakeCommands.shootDunk(outake, -0.4)); 
     operator.start().whileTrue(OutakeCommands.resetEncoder(outake));
-    
-    
 
     //---------------------------------------------------------------- OPERATOR ----------------------------------------------------------------
 

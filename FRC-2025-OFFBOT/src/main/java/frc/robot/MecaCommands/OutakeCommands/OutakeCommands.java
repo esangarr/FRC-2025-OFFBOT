@@ -41,7 +41,6 @@ public class OutakeCommands {
     public static Command moveWheels(OutakeSub outake, double speed){
         return Commands.run(()-> {
             outake.runWheelsOutake(speed);
-            
         }, outake ).finallyDo(()-> {outake.stopwheelsOutake();});
     }
 
@@ -58,9 +57,9 @@ public class OutakeCommands {
         return Commands.sequence(
             Commands.run(() -> outake.runWheelsOutake(speed), outake).withTimeout(0.1),
             Commands.run(() -> outake.stopwheelsOutake(), outake).withTimeout(0.1)
-        ).repeatedly().finallyDo(()-> {outake.stopwheelsOutake();});
+        ).repeatedly();
 
-    
+        
     }
 
 

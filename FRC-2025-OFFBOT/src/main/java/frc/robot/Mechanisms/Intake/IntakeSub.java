@@ -7,6 +7,8 @@ import lib.ForgePlus.REV.SparkMax.ForgeSparkMax;
 
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -60,9 +62,14 @@ public class IntakeSub extends NetworkSubsystem{
 
     @Override
     public void NetworkPeriodic(){
+        /* 
         publish("Intake/Angulo", getPositionAng());
         publish("Intake/CurrentSetpoint", currentSetpoint());
-        publish("Intake/Algoal",  atGoal());
+        publish("Intake/Algoal",  atGoal());*/
+
+        SmartDashboard.putNumber("Intake/Angulo", getPositionAng());
+        SmartDashboard.putNumber("Intake/CurrentSetpoint", currentSetpoint());
+        SmartDashboard.putBoolean("Intake/Algoal", atGoal());
     }
 
     public double getPositionAng(){ 

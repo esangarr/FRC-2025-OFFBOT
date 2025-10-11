@@ -1,7 +1,7 @@
 package frc.robot.Mechanisms;
 
 import lib.ForgePlus.Math.Profiles.ProfileGains.CompleteFeedForwardGains;
-
+import lib.ForgePlus.Math.Profiles.ProfileGains.PIDFGains;
 import lib.ForgePlus.Math.Profiles.ProfileGains.PIDGains;
 
 public class MechanismsConstants {
@@ -69,6 +69,8 @@ public class MechanismsConstants {
 
         public static final PIDGains pidGainsUp = new PIDGains(0.017, 0, 0);
         public static final PIDGains pidGainsDown = new PIDGains(0.0075, 0, 0);
+
+        public static final PIDGains pidGainsAlgae = new PIDGains(0.28, 0, 0);
     
     }
 

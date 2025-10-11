@@ -9,4 +9,11 @@ public class ClimberCommands {
 
         return Commands.run(()-> {climber.AngulateClimber(speed);},climber).finallyDo(()->{climber.StopAng();});
     }
+
+    public static Command climberWheels(ClimberSub climber, double speed){
+
+        return Commands.run(()-> {climber.runWheels(speed);},climber).finallyDo(()->{climber.StopWheels();});
+    }
+
+
 }

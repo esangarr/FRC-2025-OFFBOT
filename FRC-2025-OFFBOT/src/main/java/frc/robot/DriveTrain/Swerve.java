@@ -160,7 +160,7 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
             ()-> getRotation().getRadians()
         );
 
-        publish("PoseFinder", pathFinder);
+      
 
     }
 
@@ -222,19 +222,7 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
     @Override
     public void NetworkPeriodic(){
 
-        publish("Encoder 0 ", modules[0].getPosition());
-        publish("Encoder 1 ", modules[1].getPosition());
-        publish("Encoder 2 ", modules[2].getPosition());
-        publish("Encoder 3 ", modules[3].getPosition());
 
-        publish("Velocity 1", modules[0].getModuleVelocity());
-        publish("Velocity 2", modules[1].getModuleVelocity());
-        publish("Velocity 3", modules[2].getModuleVelocity());
-        publish("Velocity 4", modules[3].getModuleVelocity());
-
-        publish("ModuleStates", getModuleStates());
-        publish("ModulePositions", getModulePositions());
-        publish("ChassisSpeeds", getChassisSpeeds());
 
         for (var module : modules) {
             module.periodic();
@@ -285,8 +273,8 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
         
         estimator.update(rawGyroRotation, modulePositions);
 
-        publish("Odometry/BotPose", estimator.getEstimatedPosition());
-        publish("Odometry/QuestPose", nav.getPose());
+        //publish("Odometry/BotPose", estimator.getEstimatedPosition());
+        //publish("Odometry/QuestPose", nav.getPose());
         
 
     }

@@ -62,7 +62,7 @@ public class OculusPlus extends NetworkSubsystem{
     
 
     public OculusPlus() {
-        super("QuestNav/FORGE", false);
+        super("QuestNav", false);
         this.nav = new QuestNav();
     }
 

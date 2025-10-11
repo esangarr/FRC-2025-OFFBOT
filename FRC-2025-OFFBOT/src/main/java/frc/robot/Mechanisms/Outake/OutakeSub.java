@@ -8,6 +8,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Mechanisms.MechanismsConstants.OutConstants;
 import lib.ForgePlus.Math.Profiles.Control.PIDControl;
 import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.NetworkSubsystem;
@@ -18,6 +19,7 @@ public class OutakeSub extends NetworkSubsystem{
     private ForgeSparkMax arm; 
     private PIDControl pidUp;
     private PIDControl pidDown;
+    private PIDControl pidAlgae;
 
     private TalonFX wheels;
     private TalonFXConfiguration wheelsConfig;
@@ -31,6 +33,7 @@ public class OutakeSub extends NetworkSubsystem{
         arm = new ForgeSparkMax(OutConstants.arm_ID, "OutakeAngle");
         pidUp = new PIDControl(OutConstants.pidGainsUp);
         pidDown = new PIDControl(OutConstants.pidGainsDown);
+        pidAlgae = new PIDControl(OutConstants.pidGainsAlgae);
 
         wheels = new TalonFX(OutConstants.Wheels_ID);
         wheels.setNeutralMode(NeutralModeValue.Brake);
@@ -56,9 +59,15 @@ public class OutakeSub extends NetworkSubsystem{
 
     @Override
     public void NetworkPeriodic(){
+        /* 
         publish("angleoutake", getPosition());
         publish("CurrentSetpoint", currentSetpoint());
-        publish("GetCurrent", getCurrent());
+        publish("GetCurrent", getCurrent());*/
+
+        SmartDashboard.putNumber("angleoutake", getPosition());
+        SmartDashboard.putNumber("CurrentSetpoint", currentSetpoint());
+        SmartDashboard.putNumber("GetCurrent", getCurrent());
+
     }
 
     public double getPosition(){ 
@@ -89,6 +98,15 @@ public class OutakeSub extends NetworkSubsystem{
         double output;
 
         output = pidDown.calculate(targetPosition, getPosition()).getOutput();
+
+        arm.set(output);
+
+    }
+
+    public void setPositionAlgae(double targetPosition){
+        double output;
+
+        output = pidAlgae.calculate(targetPosition, getPosition()).getOutput();
 
         arm.set(output);
 

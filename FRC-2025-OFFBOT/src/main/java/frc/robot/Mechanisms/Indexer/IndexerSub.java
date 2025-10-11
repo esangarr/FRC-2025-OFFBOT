@@ -4,6 +4,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Mechanisms.MechanismsConstants.IndexerConstants;
 import lib.ForgePlus.REV.SparkMax.ForgeSparkMax;
 import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.NetworkSubsystem;
@@ -43,7 +44,9 @@ public class IndexerSub extends NetworkSubsystem{
 
     @Override
     public void NetworkPeriodic(){
-        publish("Index/Has Piece", hasPiece());
+        //publish("Index/Has Piece", hasPiece());
+
+        SmartDashboard.putBoolean("Index/Has Piece", hasPiece());
      }
 
     public void runWheels(double speedRight, double speedLeft){
