@@ -8,6 +8,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import lib.ForgePlus.Math.Profiles.Control.PIDControl;
 import lib.ForgePlus.   Math.Profiles.ProfileGains.PIDGains;
 import lib.ForgePlus.Math.Profiles.ProfileGains.SimpleFeedForwardGains;
@@ -88,6 +89,8 @@ public class SwerveModule{
         }else{
             turnPID.reset();
         }
+
+        SmartDashboard.putNumber("Vel", driveSparkMax.getVelocity().getRead());
     }
 
     public void RealDevicesPeriodic(){
@@ -98,6 +101,8 @@ public class SwerveModule{
             Rotation2d.fromRotations(turnSparkMax.getPosition().withReduction(turnMotorReduction).getRead());
 
         this.driveVelocity = driveSparkMax.getVelocity().toRadiansPerSecond().getRead() / driveMotorReduction * WHEELRADIUS;
+
+        SmartDashboard.putNumber("velfux", driveVelocity);
 
         driveSparkMax.setVoltage(driveVoltage);
         turnSparkMax.setVoltage(turnVoltage);

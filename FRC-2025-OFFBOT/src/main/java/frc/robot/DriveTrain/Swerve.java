@@ -112,13 +112,17 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
               }).start();
         }
 
+        var ppController = new PPHolonomicDriveController(
+            new PIDConstants(30, 0.0,0),
+             new PIDConstants(0, 0.0, 0));
+
+        ppController.setEnabled(false);
+
         AutoBuilder.configure(this::getPose,
         this::setPose,
         this::getChassisSpeeds,
         this::runVelocity,
-      new PPHolonomicDriveController(
-        new PIDConstants(5.5, 0.0,0),
-         new PIDConstants(6.4, 0.0, 0.001)),
+      ppController,
       getPathPlannerConfiguration(),
       () -> DriverStation.getAlliance().
         orElse(Alliance.Blue) == Alliance.Red,
@@ -254,7 +258,7 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
         }
 
         nav.update();
-
+/* 
         if (nav.isTracking()){
             PoseFrame[] questFrames = nav.getAllUnreadPoseFrames();
 
@@ -270,16 +274,15 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
                 // Add the measurement to our estimator
                 estimator.addVisionMeasurement(robotPose, timestamp, nav.dev.asVector());
             }
-        }
+        }*/
         
         estimator.update(rawGyroRotation, modulePositions);
 
         //publish("Odometry/BotPose", estimator.getEstimatedPosition());
-        //publish("Odometry/QuestPose", nav.getPose());
+        publish("RobotPose", estimator.getEstimatedPosition());
 
         publish("Chasis Speeds", getChassisSpeeds());
         publish("Module States", getModuleStates());
-        
 
     }
 

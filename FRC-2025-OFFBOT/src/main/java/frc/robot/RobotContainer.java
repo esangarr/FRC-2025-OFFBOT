@@ -49,10 +49,7 @@ public class RobotContainer {
   private CommandXboxController driver = new CommandXboxController(0);
   private CommandXboxController operator = new CommandXboxController(1);
 
-  private PathPlannerAuto lateral;
-  private PathPlannerAuto mover;
-  private PathPlannerAuto inicio;
-  private PathPlannerAuto rotar;
+  private PathPlannerAuto Autonomo1;
 
   public NTSendableChooser<Command> autoChooser = new NTSendableChooser<>(NTPublisher.ROBOT, "AutoSelector");
 
@@ -70,16 +67,9 @@ public class RobotContainer {
     outake = new OutakeSub();
     climber = new ClimberSub();
 
-    lateral = new PathPlannerAuto("lat");
-    mover = new PathPlannerAuto("mover");
-    inicio = new PathPlannerAuto("inicio");
-    rotar = new PathPlannerAuto("llegarRot");
+    Autonomo1 = new PathPlannerAuto("Auto1");
 
-
-    autoChooser.setDefault("mover", mover).
-    add("inicio", inicio).
-    add("lat", lateral).add("rot", rotar).
-    publish();
+    autoChooser.setDefault("Auto1", Autonomo1).publish();
   
     configureBindings();
 
