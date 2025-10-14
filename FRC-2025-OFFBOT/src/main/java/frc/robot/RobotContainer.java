@@ -117,27 +117,27 @@ public class RobotContainer {
     //---------------------------------------------------------------- OPERATOR ----------------------------------------------------------------
   
     
-    operator.a().whileTrue(ElevatorCommands.scoreCoral(elevator, outake, index,  elevator.metersToRot(73.5), outake.DegreesToRotations(120)));
+    operator.a().whileTrue(ElevatorCommands.scoreCoral(elevator, outake, index,  elevator.metersToRot(73.5), outake.DegreesToRotations(70)));
     operator.x().whileTrue(ElevatorCommands.scoreCoral(elevator, outake, index,  elevator.metersToRot(71.12), outake.DegreesToRotations(120)));
 
     operator.b().whileTrue(ElevatorCommands.scoreCoral(elevator, outake, index, elevator.metersToRot(111.76), outake.DegreesToRotations(120)));
-    operator.y().whileTrue(ElevatorCommands.scoreCoral(elevator, outake, index, elevator.metersToRot(187), outake.DegreesToRotations(100)));
+    operator.y().whileTrue(ElevatorCommands.scoreCoral(elevator, outake, index, elevator.metersToRot(187), outake.DegreesToRotations(120)));
     operator.povDown().whileTrue(ElevatorCommands.setPosDown(elevator, outake, elevator.metersToRot(80), outake.DegreesToRotations(2)));
 
 
-    operator.povLeft().toggleOnTrue(ElevatorCommands.GetAlgae(elevator, outake, elevator.metersToRot(95), outake.DegreesToRotations(90), 0.21));
-    operator.povRight().toggleOnTrue(ElevatorCommands.GetAlgae(elevator, outake, elevator.metersToRot(120), outake.DegreesToRotations(80), 0.21));
+    operator.povLeft().toggleOnTrue(ElevatorCommands.GetAlgae(elevator, outake, elevator.metersToRot(95), outake.DegreesToRotations(90), -0.21));
+    operator.povRight().toggleOnTrue(ElevatorCommands.GetAlgae(elevator, outake, elevator.metersToRot(120), outake.DegreesToRotations(80), -0.21));
 
-    operator.rightStick().whileTrue(ElevatorCommands.GetAlgae(elevator, outake, elevator.metersToRot(80), outake.DegreesToRotations(130), 0.21));
-    operator.povUp().toggleOnTrue(ElevatorCommands.GetAlgae(elevator, outake, elevator.metersToRot(187), outake.DegreesToRotations(140), 0.21));
+    operator.rightStick().whileTrue(ElevatorCommands.GetAlgae(elevator, outake, elevator.metersToRot(80), outake.DegreesToRotations(130), -0.21));
+    operator.povUp().toggleOnTrue(ElevatorCommands.GetAlgae(elevator, outake, elevator.metersToRot(187), outake.DegreesToRotations(140), -0.21));
 
 
     operator.leftBumper().whileTrue(IntakeCommands.outPiece(intake, index, 0.9, 35, 0.5 ));
     operator.rightBumper().whileTrue(IntakeCommands.clearPiece(intake, index, elevator, outake, 0.9, 0.38, 0.38 , timerOut, 35, 200));
 
 
-    operator.leftTrigger().whileTrue(OutakeCommands.moveWheels(outake, -0.8));
-    operator.rightTrigger().whileTrue(OutakeCommands.shootDunk(outake, -0.4)); 
+    operator.leftTrigger().whileTrue(OutakeCommands.moveWheels(outake, 0.8));
+    operator.rightTrigger().whileTrue(OutakeCommands.shootDunk(outake, 0.4)); 
 
   
 

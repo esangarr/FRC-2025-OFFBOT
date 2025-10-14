@@ -32,10 +32,10 @@ public class ElevatorCommands {
 
         return Commands.run(()->{ 
             Elev.setPosition(-Elev.metersToRot(63), RequestType.kDown);
-            outake.runWheelsOutake(0.6);
+            outake.runWheelsOutake(-0.6);
             outake.setPosition(1, OutakeRequestType.KDown);//--------------------------------
 
-        },Elev, outake, index).unless(()-> !index.hasPiece())
+        },Elev, outake, index).until(()-> !index.hasPiece())
 
         .andThen(
             Commands.sequence(

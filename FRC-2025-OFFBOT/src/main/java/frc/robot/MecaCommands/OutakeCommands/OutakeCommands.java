@@ -48,7 +48,7 @@ public class OutakeCommands {
 
     public static Command shootDunk(OutakeSub outake, double speed){
         return Commands.run(()-> {
-            outake.setPosition(outake.DegreesToRotations(outake.getSetpoint() - 5), OutakeRequestType.KDown);
+            outake.setPosition(outake.DegreesToRotations(outake.getSetpoint() - 15), OutakeRequestType.KDown);
             outake.runWheelsOutake(speed);
         }, outake ).finallyDo(()-> {outake.stopALL();});    
     }
