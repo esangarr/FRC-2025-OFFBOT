@@ -20,6 +20,7 @@ import gg.questnav.questnav.protos.generated.Data;
 import gg.questnav.questnav.protos.wpilib.DeviceDataProto;
 import gg.questnav.questnav.protos.wpilib.FrameDataProto;
 import lib.ForgePlus.Math.StandardDeviations;
+import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.AutoNetworkPublish;
 import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.NetworkSubsystem;
 
 
@@ -30,7 +31,7 @@ public class OculusPlus extends NetworkSubsystem{
 
     public final StandardDeviations dev = new StandardDeviations(0.02, 0.02, 0.035);
 
-    public final static Transform2d robotToQuest = new Transform2d(-0.3684, 0.0465, Rotation2d.k180deg);
+    public final static Transform2d robotToQuest = new Transform2d(-0.1770, 0.2794, Rotation2d.kCW_90deg);
 
     private final NetworkTableInstance nt4Instance = NetworkTableInstance.getDefault();
 
@@ -120,6 +121,7 @@ public class OculusPlus extends NetworkSubsystem{
         return result;
     }
 
+    @AutoNetworkPublish(key = "Quest Pose")
     public Pose2d getPose(){
         PoseFrame[] poseFrames = getAllUnreadPoseFrames();
 

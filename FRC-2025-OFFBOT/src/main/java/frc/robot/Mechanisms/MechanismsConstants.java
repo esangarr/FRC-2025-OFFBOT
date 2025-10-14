@@ -45,7 +45,7 @@ public class MechanismsConstants {
 
 
         public static final CompleteFeedForwardGains FFgains = new CompleteFeedForwardGains(
-            0.7, 
+            1, 
             0, 
             0, 
             0);
@@ -70,7 +70,14 @@ public class MechanismsConstants {
         public static final PIDGains pidGainsUp = new PIDGains(0.017, 0, 0);
         public static final PIDGains pidGainsDown = new PIDGains(0.0075, 0, 0);
 
-        public static final PIDGains pidGainsAlgae = new PIDGains(0.28, 0, 0);
+        public static final PIDGains pidGainsAlgae = new PIDGains(0.06, 0, 0);
+        public static final CompleteFeedForwardGains FFgains = new CompleteFeedForwardGains(
+            0.7, 
+            0, 
+            0, 
+            0);
+
+    
     
     }
 

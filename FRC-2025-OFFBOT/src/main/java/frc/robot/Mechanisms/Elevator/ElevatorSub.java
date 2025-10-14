@@ -2,7 +2,9 @@
 package frc.robot.Mechanisms.Elevator;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -19,11 +21,10 @@ public class ElevatorSub extends NetworkSubsystem{
     private TalonFX leader, follower;
 
     private TalonFXConfiguration LeaderConfig, FollowerConfig;
+    private TalonFXConfigurator leaderConfigurator, followerConfigurator;
 
-    private Encoder encoder;
 
     private  MotionMagicExpoVoltage leader_request;
-
 
     private double rotorPosLatency;
     private double rotorPosRotations;
@@ -35,37 +36,40 @@ public class ElevatorSub extends NetworkSubsystem{
         leader = new TalonFX(ElevatorConstants.Leader_ID);
         follower = new TalonFX(ElevatorConstants.Follower_ID);
 
-        leader.getPosition().getValueAsDouble();
-
         leader_request = new MotionMagicExpoVoltage(0);
 
         LeaderConfig = new TalonFXConfiguration();
+        leaderConfigurator = leader.getConfigurator();
+
         FollowerConfig = new TalonFXConfiguration();
+        followerConfigurator = follower.getConfigurator();
+
+        var motorConfigs = new MotorOutputConfigs();
+
+        motorConfigs.Inverted = InvertedValue.Clockwise_Positive;
+        motorConfigs.NeutralMode = NeutralModeValue.Brake;
+
+
 
         var limitConfigs = new CurrentLimitsConfigs();
         limitConfigs.StatorCurrentLimit = 80;
         limitConfigs.StatorCurrentLimitEnable = true;
 
-        leader.setNeutralMode(NeutralModeValue.Brake);
-        follower.setNeutralMode(NeutralModeValue.Brake );
-
-        LeaderConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        LeaderConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        
-
-        FollowerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        FollowerConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
         follower.setControl(new Follower(leader.getDeviceID(), true));
 
-        leader.getConfigurator().apply(LeaderConfig);
-        leader.getConfigurator().apply(limitConfigs);
-
-        follower.getConfigurator().apply(FollowerConfig);
+    
+        leader.getConfigurator().apply(limitConfigs);   
+        
         follower.getConfigurator().apply(limitConfigs);
 
-       
-        encoder = new Encoder(1, 2, true, Encoder.EncodingType.k4X);
+        leaderConfigurator.refresh(motorConfigs);
+        leaderConfigurator.apply(motorConfigs);
+
+        followerConfigurator.refresh(motorConfigs);
+        followerConfigurator.apply(motorConfigs);
+
+
 
         configMotion();
 
@@ -86,7 +90,7 @@ public class ElevatorSub extends NetworkSubsystem{
         var talonFXConfigs = new TalonFXConfiguration();
         var slot0Configs = talonFXConfigs.Slot0;
 
-        slot0Configs.kS = 0.30; // Add 0.25 V output to overcome static friction
+        slot0Configs.kS = 0.33; // Add 0.25 V output to overcome static friction
         slot0Configs.kV = 0.1428; // A velocity target of 1 rps results in 0.12 V output
         slot0Configs.kA = 0.014; // An acceleration of 1 rps/s requires 0.01 V output
         slot0Configs.kP = 0.07; // A position error of 2.5 rotations results in 12 V output
@@ -110,6 +114,8 @@ public class ElevatorSub extends NetworkSubsystem{
 
         limitConfigs.StatorCurrentLimit = 60;
         limitConfigs.StatorCurrentLimitEnable = true;
+
+        talonFXConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         
         leader.getConfigurator().apply(limitConfigs);
         follower.getConfigurator().apply(limitConfigs);
@@ -164,11 +170,6 @@ public class ElevatorSub extends NetworkSubsystem{
 
     public void setVoltage(double voltage){
         leader.setVoltage(voltage);
-    }
-
-
-    public double getDistanceCm(){
-        return ((124.5/17440) * encoder.getDistance()) + 63.5 ;
     }
 
     public void runMot(double speed){

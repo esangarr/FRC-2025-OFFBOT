@@ -1,42 +1,52 @@
 
 package frc.robot.Mechanisms.Outake;
 
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfigurator;
+import com.ctre.phoenix6.configs.TalonFXSConfigurator;
+import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Mechanisms.MechanismsConstants.OutConstants;
+import lib.ForgePlus.Math.Profiles.Control.FeedForwardControl;
 import lib.ForgePlus.Math.Profiles.Control.PIDControl;
 import lib.ForgePlus.NetworkTableUtils.NetworkSubsystem.NetworkSubsystem;
 import lib.ForgePlus.REV.SparkMax.ForgeSparkMax;
 
 public class OutakeSub extends NetworkSubsystem{
 
-    private ForgeSparkMax arm; 
-    private PIDControl pidUp;
-    private PIDControl pidDown;
-    private PIDControl pidAlgae;
+    private TalonFX arm;
+
 
     private TalonFX wheels;
     private TalonFXConfiguration wheelsConfig;
 
-    private RelativeEncoder relEncoder ;
+    private TalonFXConfiguration armConfig;
+    
+    private PositionVoltage arm_request;
+
+    private double rotorPosLatency;
+    private double rotorPosRotations;
+
 
 
     public OutakeSub () {
         super("OutakeSubsystem", false);
 
-        arm = new ForgeSparkMax(OutConstants.arm_ID, "OutakeAngle");
-        pidUp = new PIDControl(OutConstants.pidGainsUp);
-        pidDown = new PIDControl(OutConstants.pidGainsDown);
-        pidAlgae = new PIDControl(OutConstants.pidGainsAlgae);
+        arm = new TalonFX(OutConstants.arm_ID);
+        armConfig = new TalonFXConfiguration();
+
+        arm_request = new PositionVoltage(0);
 
         wheels = new TalonFX(OutConstants.Wheels_ID);
-        wheels.setNeutralMode(NeutralModeValue.Brake);
 
         wheelsConfig = new TalonFXConfiguration();
 
@@ -44,72 +54,110 @@ public class OutakeSub extends NetworkSubsystem{
         wheelsConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         wheelsConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-        relEncoder = arm.getEncoder();
+        wheels.getConfigurator().apply(wheelsConfig);
+        arm.getConfigurator().apply(armConfig);
 
-        arm.flashConfiguration(
-            OutConstants.armInveerted, 
-            IdleMode.kBrake, 
-            OutConstants.armCurrentLimit, 
-            false);
+        configMotion();
 
-
-        pidUp.setTolerance(OutConstants.pidTolerance);
-        pidDown.setTolerance(OutConstants.pidTolerance);
+    
     }
 
     @Override
     public void NetworkPeriodic(){
-        /* 
-        publish("angleoutake", getPosition());
-        publish("CurrentSetpoint", currentSetpoint());
-        publish("GetCurrent", getCurrent());*/
 
+        updatePosition();
+    
         SmartDashboard.putNumber("angleoutake", getPosition());
-        SmartDashboard.putNumber("CurrentSetpoint", currentSetpoint());
-        SmartDashboard.putNumber("GetCurrent", getCurrent());
+        SmartDashboard.putNumber("Rotations", rotorPosRotations);
+        //SmartDashboard.putNumber("CurrentSetpoint", currentSetpoint());
+        SmartDashboard.putNumber("GetOutSetpoint", getSetpoint());
+
+        SmartDashboard.putBoolean("Is Spinning", isWheelSpinning());
+
 
     }
 
+    public void updatePosition(){
+        // acquire a refreshed TalonFX rotor position signal
+        var rotorPosSignal = arm.getRotorPosition();
+
+        rotorPosRotations = rotorPosSignal.getValueAsDouble();
+
+        rotorPosLatency = rotorPosSignal.getTimestamp().getLatency();
+
+    }
+
+    public void configMotion(){
+        
+        var talonFXConfigs = new TalonFXConfiguration();
+        var slot0Configs = talonFXConfigs.Slot0;
+
+        slot0Configs.kS = 0.35; // Add 0.25 V output to overcome static friction
+        slot0Configs.kV = 0; // A velocity target of 1 rps results in 0.12 V output
+        slot0Configs.kA = 0; // An acceleration of 1 rps/s requires 0.01 V output
+        slot0Configs.kP = 1.3; // A position error of 2.5 rotations results in 12 V output
+        slot0Configs.kI = 0; // no output for integrated error
+        slot0Configs.kD = 0 ; // A velocity error of 1 rps results in 0.1 V output
+    
+
+        var slot1Configs = talonFXConfigs.Slot1;
+
+        slot1Configs.kS = 0; // Add 0.25 V output to overcome static friction
+        slot1Configs.kV = 0; // A velocity target of 1 rps results in 0.12 V output
+        slot1Configs.kA = 0; // An acceleration of 1 rps/s requires 0.01 V output
+        slot1Configs.kP = 1; // A position error of 2.5 rotations results in 12 V output
+        slot1Configs.kI = 0; // no output for integrated error
+        slot1Configs.kD = 0 ; // A velocity error of 1 rps results in 0.1 V output
+    
+        
+        talonFXConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+        arm.getConfigurator().apply(talonFXConfigs);
+
+    }
+
+    public enum OutakeRequestType{
+        kUp,
+        KDown,
+        KAlgae
+    }
+
+    public void setPosition(double position, OutakeRequestType type){
+        if (type == OutakeRequestType.kUp){
+        arm.setControl(arm_request.withPosition(position).withSlot(0));}
+        else if (type == OutakeRequestType.KDown){
+        arm.setControl(arm_request.withPosition(position).withSlot(1));
+        }
+        
+
+    }
+
+    public double getSetpoint(){
+        return RotationsToDegrees(arm.getClosedLoopReference().getValueAsDouble());
+    }
+
+
     public double getPosition(){ 
-        return (relEncoder.getPosition() / 66.666) * 360;
+        return (rotorPosRotations / 66.666) * 360;
+    }
+
+    public double RotationsToDegrees(double rotations){
+        return (rotations / 66.666) * 360;
+    }
+
+    public double DegreesToRotations(double degrees){
+        double gamma = degrees / 360;
+        return gamma * 66.666;
     }
 
     public double getCurrent(){
         return wheels.getTorqueCurrent().getValueAsDouble();
     }
 
-    
-    public void resetEconder(){
-        relEncoder.setPosition(0);
-    }
+     
 
-    public void setPositionUp(double targetPosition) {
-
-        double output;
-
-        output = pidUp.calculate(targetPosition, getPosition()).getOutput();
-
-        arm.set(output);
-
-    }
-
-    public void setPositionDown(double targetPosition) {
-
-        double output;
-
-        output = pidDown.calculate(targetPosition, getPosition()).getOutput();
-
-        arm.set(output);
-
-    }
-
-    public void setPositionAlgae(double targetPosition){
-        double output;
-
-        output = pidAlgae.calculate(targetPosition, getPosition()).getOutput();
-
-        arm.set(output);
-
+    public void setVoltage(double voltage){
+        arm.setVoltage(voltage);
     }
 
 
@@ -121,16 +169,9 @@ public class OutakeSub extends NetworkSubsystem{
         wheels.set(speed);
     }
 
-    public double currentSetpoint(){
-        return pidUp.getSetpoint()*pidDown.getSetpoint() >= 0 ? pidUp.getSetpoint() : pidDown.getSetpoint();
-    }
 
     public boolean isWheelSpinning(){
         return wheels.get() != 0;
-    }
-
-    public boolean atGoal(){
-        return pidDown.atSetpoint() || pidUp.atSetpoint();
     }
 
     public void stopArm(){

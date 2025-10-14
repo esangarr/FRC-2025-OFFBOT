@@ -21,6 +21,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import lib.ForgePlus.Equals.Conditional;
@@ -275,6 +276,9 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
 
         //publish("Odometry/BotPose", estimator.getEstimatedPosition());
         //publish("Odometry/QuestPose", nav.getPose());
+
+        publish("Chasis Speeds", getChassisSpeeds());
+        publish("Module States", getModuleStates());
         
 
     }

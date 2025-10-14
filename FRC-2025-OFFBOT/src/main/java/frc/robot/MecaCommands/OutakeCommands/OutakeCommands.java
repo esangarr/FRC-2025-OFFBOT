@@ -2,9 +2,11 @@ package frc.robot.MecaCommands.OutakeCommands;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Mechanisms.Outake.OutakeSub;
+import frc.robot.Mechanisms.Outake.OutakeSub.OutakeRequestType;
 
 public class OutakeCommands {
 
@@ -13,30 +15,30 @@ public class OutakeCommands {
         return Commands.run(()-> {outake.runArm(joystick.getAsDouble());},outake).finallyDo(()->{outake.stopArm();});
     }
 
+    public static Command setVoltage(OutakeSub outake, double voltage, double speed){
+        return Commands.parallel(
+            Commands.run(()-> {outake.setVoltage(voltage);}),
+            Commands.sequence(
+                Commands.run(() -> outake.runWheelsOutake(speed), outake).withTimeout(0.1),
+                Commands.run(() -> outake.stopwheelsOutake(), outake).withTimeout(0.1)).repeatedly());
+    }
+
     public static Command setAngleUp(OutakeSub outake, double angle){
 
         return Commands.run(()-> {
-            outake.setPositionUp(angle);
-        },outake)
-        .finallyDo(()->{
-            outake.stopArm();
-        });
+            outake.setPosition(angle, OutakeRequestType.kUp);
+        },outake);
     }
 
     public static Command setAngleDown(OutakeSub outake, double angle){
 
         return Commands.run(()-> {
-            outake.setPositionDown(angle);
+            outake.setPosition(angle, OutakeRequestType.KDown);
         },outake).finallyDo(()->{
             outake.stopArm();
         });
     }
 
-    public static Command resetEncoder(OutakeSub outake){
-        return Commands.run(()-> {
-            outake.resetEconder();
-        }, outake );
-    }
 
     public static Command moveWheels(OutakeSub outake, double speed){
         return Commands.run(()-> {
@@ -46,7 +48,7 @@ public class OutakeCommands {
 
     public static Command shootDunk(OutakeSub outake, double speed){
         return Commands.run(()-> {
-            outake.setPositionDown(outake.currentSetpoint() - 30);
+            outake.setPosition(outake.DegreesToRotations(outake.getSetpoint() - 5), OutakeRequestType.KDown);
             outake.runWheelsOutake(speed);
         }, outake ).finallyDo(()-> {outake.stopALL();});    
     }
