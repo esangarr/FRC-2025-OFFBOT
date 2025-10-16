@@ -74,6 +74,9 @@ public class OutakeSub extends NetworkSubsystem{
 
         SmartDashboard.putBoolean("Is Spinning", isWheelSpinning());
 
+        SmartDashboard.putNumber("Get Current", getCurrent());
+        SmartDashboard.putNumber("Get Stall", getCurrentStall());
+
 
     }
 
@@ -90,6 +93,7 @@ public class OutakeSub extends NetworkSubsystem{
     public void configMotion(){
         
         var talonFXConfigs = new TalonFXConfiguration();
+
         var slot0Configs = talonFXConfigs.Slot0;
 
         slot0Configs.kS = 0.35; // Add 0.25 V output to overcome static friction
@@ -105,9 +109,18 @@ public class OutakeSub extends NetworkSubsystem{
         slot1Configs.kS = 0; // Add 0.25 V output to overcome static friction
         slot1Configs.kV = 0; // A velocity target of 1 rps results in 0.12 V output
         slot1Configs.kA = 0; // An acceleration of 1 rps/s requires 0.01 V output
-        slot1Configs.kP = 1; // A position error of 2.5 rotations results in 12 V output
+        slot1Configs.kP = 0.92; // A position error of 2.5 rotations results in 12 V output
         slot1Configs.kI = 0; // no output for integrated error
         slot1Configs.kD = 0 ; // A velocity error of 1 rps results in 0.1 V output
+
+        var slot2Configs = talonFXConfigs.Slot2;
+
+        slot2Configs.kS = 1; // Add 0.25 V output to overcome static friction
+        slot2Configs.kV = 0; // A velocity target of 1 rps results in 0.12 V output
+        slot2Configs.kA = 0; // An acceleration of 1 rps/s requires 0.01 V output
+        slot2Configs.kP = 1.8; // A position error of 2.5 rotations results in 12 V output
+        slot2Configs.kI = 0; // no output for integrated error
+        slot2Configs.kD = 0 ; // A velocity error of 1 rps results in 0.1 V output
     
         
         talonFXConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -123,13 +136,24 @@ public class OutakeSub extends NetworkSubsystem{
     }
 
     public void setPosition(double position, OutakeRequestType type){
-        if (type == OutakeRequestType.kUp){
-        arm.setControl(arm_request.withPosition(position).withSlot(0));}
-        else if (type == OutakeRequestType.KDown){
-        arm.setControl(arm_request.withPosition(position).withSlot(1));
-        }
-        
 
+        if (getPosition() < -2 || getSetpoint() < -2){
+            arm.stopMotor();
+        }else{
+            if (type == OutakeRequestType.kUp){
+                arm.setControl(arm_request.withPosition(position).withSlot(0));}
+                else if (type == OutakeRequestType.KDown){
+                arm.setControl(arm_request.withPosition(position).withSlot(1));} 
+                else if (type == OutakeRequestType.KAlgae){
+                arm.setControl(arm_request.withPosition(position).withSlot(2));
+                }
+            }
+
+
+    }
+
+    public void resetArm(){
+        
     }
 
     public double getSetpoint(){
@@ -152,6 +176,12 @@ public class OutakeSub extends NetworkSubsystem{
 
     public double getCurrent(){
         return wheels.getTorqueCurrent().getValueAsDouble();
+
+    }
+
+    public double getCurrentStall(){
+        return wheels.getMotorStallCurrent().getValueAsDouble();
+
     }
 
      

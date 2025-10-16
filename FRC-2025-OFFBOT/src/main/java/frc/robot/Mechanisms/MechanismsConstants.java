@@ -38,10 +38,10 @@ public class MechanismsConstants {
 
         public final static double intakeTolerance = 1.5;
         
-        public static final PIDGains pidGainsUp = new PIDGains(0.00483 , 0, 0.0001);
+        public static final PIDGains pidGainsUp = new PIDGains(0.00466 , 0, 0.0001);
 
 
-        public static final PIDGains pidGainsDown = new PIDGains(0.0065, 0, 0.00037);
+        public static final PIDGains pidGainsDown = new PIDGains(0.005, 0, 0.00037);
 
 
         public static final CompleteFeedForwardGains FFgains = new CompleteFeedForwardGains(

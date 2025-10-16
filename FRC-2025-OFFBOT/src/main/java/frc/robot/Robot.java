@@ -49,7 +49,6 @@ public class Robot extends TimedRobot {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
-      NTPublisher.publish(NTPublisher.ROBOT, "Auto/Selected", m_autonomousCommand.getName());
       m_autonomousCommand.schedule();
     }
   }

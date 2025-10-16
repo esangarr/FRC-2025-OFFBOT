@@ -107,16 +107,16 @@ public class IntakeCommands {
                     index.runWheels(rightSpeed, leftSpeed);
                 }, intake, index)
     
-                .until(() -> timer.calculate(index.getCurrentRight() > 27 || index.getCurrentLeft() > 27))
+                .until(() -> timer.calculate(index.getCurrentRight() > 24 || index.getCurrentLeft() > 14))
                 
                 .andThen(Commands.run(() -> {
     
     
-                    if (index.getCurrentRight() >= 27){
+                    if (index.getCurrentRight() >= 24){
                         intake.runWheelsIntake(-intakeSpeed/2);
                         index.runWheels(-rightSpeed, leftSpeed);}
     
-                    if (index.getCurrentLeft() >= 27){
+                    if (index.getCurrentLeft() >= 24){
                         intake.runWheelsIntake(-intakeSpeed/2);
                         index.runWheels(rightSpeed, -leftSpeed);}
     
@@ -156,11 +156,10 @@ public class IntakeCommands {
         double indexSpeed){
             return Commands.run(()->{
                 intake.setPositionUp(angleUp);
-            }, intake, index).until(()-> intake.atGoal()).
-            andThen(Commands.run(()-> {
                 intake.runWheelsIntake(-intakeSpeed);
-                index.runWheels(-indexSpeed, -indexSpeed);}))
-                .finallyDo(()->{index.stop(); intake.stopAll();});
+                index.runWheels(-indexSpeed, -indexSpeed);
+            }, intake, index).until(()-> intake.atGoal())
+                .finallyDo(()->{index.stop(); intake.stopAll(); index.stop();});
         }
 
 }

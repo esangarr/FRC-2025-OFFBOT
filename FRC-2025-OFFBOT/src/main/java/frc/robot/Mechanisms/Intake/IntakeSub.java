@@ -43,7 +43,7 @@ public class IntakeSub extends NetworkSubsystem{
         motorAng.flashConfiguration(
         MechanismsConstants.IntakeConstants.AngulatorInverted,
         IdleMode.kBrake,
-        MechanismsConstants.IntakeConstants.AngulatorCurrentLimit,
+        0,
         true);
         
         pidUp.setTolerance(IntakeConstants.pidTolerance);

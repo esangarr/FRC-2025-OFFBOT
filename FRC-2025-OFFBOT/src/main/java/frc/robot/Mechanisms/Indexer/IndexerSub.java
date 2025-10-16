@@ -47,6 +47,8 @@ public class IndexerSub extends NetworkSubsystem{
         //publish("Index/Has Piece", hasPiece());
 
         SmartDashboard.putBoolean("Index/Has Piece", hasPiece());
+        SmartDashboard.putNumber("CurrentRight", getCurrentRight());
+        SmartDashboard.putNumber("CurrentLeft", getCurrentLeft());
      }
 
     public void runWheels(double speedRight, double speedLeft){

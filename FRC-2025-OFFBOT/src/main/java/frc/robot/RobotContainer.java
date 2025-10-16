@@ -12,6 +12,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.DriveCommands.DriveCommands;
@@ -24,9 +26,11 @@ import frc.robot.MecaCommands.IntakeCommands.IntakeCommands;
 import frc.robot.MecaCommands.OutakeCommands.OutakeCommands;
 import frc.robot.Mechanisms.Climber.ClimberSub;
 import frc.robot.Mechanisms.Elevator.ElevatorSub;
+import frc.robot.Mechanisms.Elevator.ElevatorSub.RequestType;
 import frc.robot.Mechanisms.Indexer.IndexerSub;
 import frc.robot.Mechanisms.Intake.IntakeSub;
 import frc.robot.Mechanisms.Outake.OutakeSub;
+import frc.robot.Mechanisms.Outake.OutakeSub.OutakeRequestType;
 import lib.ForgePlus.NetworkTableUtils.NTPublisher;
 import lib.ForgePlus.NetworkTableUtils.NTSendableChooser;
 import lib.ForgePlus.SwerveLib.Utils.Smoothjoystick;
@@ -41,7 +45,7 @@ public class RobotContainer {
   private ElevatorSub elevator;
   private final OutakeSub outake;
   private final ClimberSub climber;
-  private final Debouncer timerOut = new Debouncer(0.45);
+  private final Debouncer timerOut = new Debouncer(0.3);
 
 
   private final Smoothjoystick smooth = new Smoothjoystick(1.1);
@@ -49,9 +53,10 @@ public class RobotContainer {
   private CommandXboxController driver = new CommandXboxController(0);
   private CommandXboxController operator = new CommandXboxController(1);
 
-  private PathPlannerAuto Autonomo1;
+  private PathPlannerAuto mover;
+  private PathPlannerAuto giro;
 
-  public NTSendableChooser<Command> autoChooser = new NTSendableChooser<>(NTPublisher.ROBOT, "AutoSelector");
+  public SendableChooser<Command> chooser = new SendableChooser<>();
 
 
   public RobotContainer() {
@@ -67,9 +72,14 @@ public class RobotContainer {
     outake = new OutakeSub();
     climber = new ClimberSub();
 
-    Autonomo1 = new PathPlannerAuto("Auto1");
+    mover = new PathPlannerAuto("Auto1");
+    giro = new PathPlannerAuto("AutoGiro");
 
-    autoChooser.setDefault("Auto1", Autonomo1).publish();
+
+    chooser.addOption("AutoGiro", giro);
+    chooser.setDefaultOption("Mover", mover);
+
+    SmartDashboard.putData("AutoSelector", chooser);
   
     configureBindings();
 
@@ -84,7 +94,6 @@ public class RobotContainer {
       smooth.filter(()-> -driver.getLeftX() * 0.9),
       smooth.filter(()-> -driver.getRightX() * 0.8)));
 
-    
    
     driver.rightBumper().whileTrue(ClimberCommands.angleClimber(climber, 1));
     driver.leftBumper().whileTrue(ClimberCommands.angleClimber(climber, -1));
@@ -94,44 +103,44 @@ public class RobotContainer {
     driver.x().whileTrue(chassis.getPathFinder().toPoseCommand(new Pose2d(3.19,4.03, Rotation2d.kZero)));
     driver.b().whileTrue(DriveCommands.resetHeading(chassis));
 
-    driver.povLeft().whileTrue(DriveCommands.moveInX(chassis, -0.6));
-    driver.povRight().whileTrue(DriveCommands.moveInX(chassis, 0.6));
-    driver.povUp().whileTrue(DriveCommands.moveInY(chassis, -0.6));
-    driver.povDown().whileTrue(DriveCommands.moveInY(chassis,0.6));
+    driver.povLeft().whileTrue(DriveCommands.moveInX(chassis, 0.6));
+    driver.povRight().whileTrue(DriveCommands.moveInX(chassis, -0.6));
+    driver.povUp().whileTrue(DriveCommands.moveInY(chassis, 0.6));
+    driver.povDown().whileTrue(DriveCommands.moveInY(chassis,-0.6));
 
     driver.y().toggleOnTrue(IntakeCommands.setAngleUp(intake, 35)); // Cambiar a Driver
-    driver.a().whileTrue(IntakeCommands.setAngleDown(intake, 200)); // Cambiar a Driver
+    driver.a().whileTrue(IntakeCommands.setAngleDown(intake, 240)); // Cambiar a Driver
 
     //---------------------------------------------------------------- DRIVER ----------------------------------------------------------------
 
     //---------------------------------------------------------------- OPERATOR ----------------------------------------------------------------
-  
+    outake.setDefaultCommand(OutakeCommands.armManual(outake, ()-> operator.getRightY()*0.2));
     
-    operator.a().whileTrue(ElevatorCommands.scoreCoral(elevator, outake, index,  elevator.metersToRot(73.5), outake.DegreesToRotations(70)));
-    operator.x().whileTrue(ElevatorCommands.scoreCoral(elevator, outake, index,  elevator.metersToRot(71.12), outake.DegreesToRotations(120)));
+    
+    operator.a().toggleOnTrue(ElevatorCommands.scoreCoral2(elevator, outake, index,  elevator.metersToRot(88), outake.DegreesToRotations(80)));
+    operator.x().toggleOnTrue(ElevatorCommands.scoreCoral2(elevator, outake, index,  elevator.metersToRot(72), outake.DegreesToRotations(125)));
 
-    operator.b().whileTrue(ElevatorCommands.scoreCoral(elevator, outake, index, elevator.metersToRot(111.76), outake.DegreesToRotations(120)));
-    operator.y().whileTrue(ElevatorCommands.scoreCoral(elevator, outake, index, elevator.metersToRot(187), outake.DegreesToRotations(120)));
+    operator.b().toggleOnTrue(ElevatorCommands.scoreCoral2(elevator, outake, index, elevator.metersToRot(117), outake.DegreesToRotations(126)));
+    operator.y().toggleOnTrue(ElevatorCommands.scoreCoral2(elevator, outake, index, elevator.metersToRot(187), outake.DegreesToRotations(120)));
+
     operator.povDown().whileTrue(ElevatorCommands.setPosDown(elevator, outake, elevator.metersToRot(80), outake.DegreesToRotations(2)));
+    operator.leftStick().whileTrue(ElevatorCommands.takeCoral(elevator, outake, elevator.metersToRot(85 ), outake.DegreesToRotations(2)));
 
 
-    operator.povLeft().toggleOnTrue(ElevatorCommands.GetAlgae(elevator, outake, elevator.metersToRot(95), outake.DegreesToRotations(90), -0.21));
-    operator.povRight().toggleOnTrue(ElevatorCommands.GetAlgae(elevator, outake, elevator.metersToRot(120), outake.DegreesToRotations(80), -0.21));
+    operator.povLeft().toggleOnTrue(ElevatorCommands.GetAlgae(elevator, outake, elevator.metersToRot(105), outake.DegreesToRotations(90), -0.21, RequestType.kUP, OutakeRequestType.kUp));
+    operator.povRight().toggleOnTrue(ElevatorCommands.GetAlgae(elevator, outake, elevator.metersToRot(130), outake.DegreesToRotations(80), -0.21,RequestType.kUP, OutakeRequestType.kUp));
 
-    operator.rightStick().whileTrue(ElevatorCommands.GetAlgae(elevator, outake, elevator.metersToRot(80), outake.DegreesToRotations(130), -0.21));
-    operator.povUp().toggleOnTrue(ElevatorCommands.GetAlgae(elevator, outake, elevator.metersToRot(187), outake.DegreesToRotations(140), -0.21));
+    operator.rightStick().toggleOnTrue(ElevatorCommands.GetAlgae(elevator, outake, elevator.metersToRot(80), outake.DegreesToRotations(135), -0.21,RequestType.kDown, OutakeRequestType.KAlgae));
+    operator.povUp().toggleOnTrue(ElevatorCommands.GetAlgae(elevator, outake, elevator.metersToRot(187), outake.DegreesToRotations(140), -0.21, RequestType.kUP, OutakeRequestType.KAlgae));
 
 
     operator.leftBumper().whileTrue(IntakeCommands.outPiece(intake, index, 0.9, 35, 0.5 ));
-    operator.rightBumper().whileTrue(IntakeCommands.clearPiece(intake, index, elevator, outake, 0.9, 0.38, 0.38 , timerOut, 35, 200));
+    operator.rightBumper().whileTrue(IntakeCommands.clearPiece(intake, index, elevator, outake, 0.9, 0.23, 0.23 , timerOut, 35, 200));
 
 
-    operator.leftTrigger().whileTrue(OutakeCommands.moveWheels(outake, 0.8));
+    operator.leftTrigger().whileTrue(OutakeCommands.moveWheels(outake, 1));
     operator.rightTrigger().whileTrue(OutakeCommands.shootDunk(outake, 0.4)); 
 
-  
-
-    //operator.leftStick().whileTrue(OutakeCommands.setVoltage(outake, 0.58, 0.2));
 
     //---------------------------------------------------------------- OPERATOR ----------------------------------------------------------------
 
@@ -139,7 +148,7 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
+    return chooser.getSelected();
   }
 
 }

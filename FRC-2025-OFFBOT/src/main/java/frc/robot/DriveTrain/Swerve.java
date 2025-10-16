@@ -89,8 +89,8 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
         }else{
             //navX = new AHRS(NavXComType.kMXP_SPI);
             pigeon = new Pigeon2(SwerveConstants.pigeon_ID);
-            translationPPgains = new PIDConstants(5.5, 0, 0); 
-            rotationPPgains = new PIDConstants(2.93, 0.0, 0.001);
+            translationPPgains = new PIDConstants(0, 0, 0); 
+            rotationPPgains = new PIDConstants(0., 0, 0.0);
         }
 
         modules[0] = new SwerveModule(0);
@@ -113,12 +113,15 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
         }
 
         var ppController = new PPHolonomicDriveController(
-            new PIDConstants(30, 0.0,0),
+            new PIDConstants(2, 0.0,0.56),
              new PIDConstants(0, 0.0, 0));
 
-        ppController.setEnabled(false);
+        ppController.setEnabled(true);
+   
+        
 
-        AutoBuilder.configure(this::getPose,
+        AutoBuilder.configure(
+        this::getPose,
         this::setPose,
         this::getChassisSpeeds,
         this::runVelocity,
@@ -258,7 +261,7 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
         }
 
         nav.update();
-/* 
+
         if (nav.isTracking()){
             PoseFrame[] questFrames = nav.getAllUnreadPoseFrames();
 
@@ -274,7 +277,7 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
                 // Add the measurement to our estimator
                 estimator.addVisionMeasurement(robotPose, timestamp, nav.dev.asVector());
             }
-        }*/
+        }
         
         estimator.update(rawGyroRotation, modulePositions);
 

@@ -1,5 +1,6 @@
 package frc.robot.MecaCommands.OutakeCommands;
 
+import java.io.OutputStream;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.units.measure.Angle;
@@ -47,8 +48,9 @@ public class OutakeCommands {
     }
 
     public static Command shootDunk(OutakeSub outake, double speed){
+        double setDunk = outake.getSetpoint() - 0.85;
         return Commands.run(()-> {
-            outake.setPosition(outake.DegreesToRotations(outake.getSetpoint() - 15), OutakeRequestType.KDown);
+            outake.setPosition(outake.DegreesToRotations(setDunk), OutakeRequestType.KDown);
             outake.runWheelsOutake(speed);
         }, outake ).finallyDo(()-> {outake.stopALL();});    
     }
@@ -62,6 +64,11 @@ public class OutakeCommands {
         ).repeatedly();
 
         
+    }
+
+    public static Command resetArmEncoder(OutakeSub outake){
+
+        return Commands.runOnce(()-> {outake.resetArm();}, outake);
     }
 
 
