@@ -152,8 +152,8 @@ public class OutakeSub extends NetworkSubsystem{
 
     }
 
-    public void resetArm(){
-        
+    public void reset(){
+        arm.setPosition(0);
     }
 
     public double getSetpoint(){
@@ -184,7 +184,9 @@ public class OutakeSub extends NetworkSubsystem{
 
     }
 
-     
+    public boolean atGoal(){
+        return Math.abs(getPosition() - getSetpoint()) <=  2;
+    }
 
     public void setVoltage(double voltage){
         arm.setVoltage(voltage);

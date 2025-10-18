@@ -4,6 +4,12 @@
 
 package frc.robot;
 
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.CvSink;
+import edu.wpi.first.cscore.CvSource;
+import edu.wpi.first.cscore.MjpegServer;
+import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.util.PixelFormat;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -13,6 +19,9 @@ import lib.ForgePlus.NetworkTableUtils.NTPublisher;
 public class Robot extends TimedRobot {
 
   private Command m_autonomousCommand;
+  
+  UsbCamera usbCamera = new UsbCamera("USB Camera 0", 0);
+  MjpegServer mjpegServer1 = new MjpegServer("serve_USB Camera 0", 1181);
 
   private final RobotContainer m_robotContainer;
   public Robot() {
@@ -22,7 +31,18 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-    public void robotInit() {}
+    public void robotInit() {
+      
+      
+    mjpegServer1.setSource(usbCamera);
+
+    CvSink cvSink = new CvSink("opencv_USB Camera 0");
+    cvSink.setSource(usbCamera);
+
+    CvSource outputStream = new CvSource("Blur", PixelFormat.kMJPEG, 640, 480, 30);
+    MjpegServer mjpegServer2 = new MjpegServer("serve_Blur", 1182);
+    mjpegServer2.setSource(outputStream);
+    }
 
   @Override
   public void robotPeriodic() {

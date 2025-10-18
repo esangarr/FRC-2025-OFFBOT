@@ -68,7 +68,7 @@ public class OutakeCommands {
 
     public static Command resetArmEncoder(OutakeSub outake){
 
-        return Commands.runOnce(()-> {outake.resetArm();}, outake);
+        return Commands.runOnce(()-> {outake.reset();}, outake);
     }
 
 

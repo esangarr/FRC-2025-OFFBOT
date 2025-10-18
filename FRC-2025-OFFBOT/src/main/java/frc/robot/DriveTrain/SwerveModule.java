@@ -60,8 +60,8 @@ public class SwerveModule{
      
             this.turnPIDGains = new PIDGains(2.5, 0,0.0001);
 
-            this.drivePIDGains = new PIDGains(1.25, 0, 0);
-            this.driveFFGains = new SimpleFeedForwardGains(0.35, 1.7, 0);
+            this.drivePIDGains = new PIDGains(1.25, 0, 0.001);
+            this.driveFFGains = new SimpleFeedForwardGains(0, 0, 0);
             
             createSparks(index);
 
@@ -236,7 +236,7 @@ public class SwerveModule{
         driveSparkMax.flashConfiguration(
             isDriveMotorInverted,
             IdleMode.kBrake,
-            50,
+            60,
             true);
         
         turnSparkMax.flashConfiguration(

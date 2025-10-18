@@ -32,7 +32,7 @@ public class ElevatorCommands {
         return Commands.run(()->{ 
             Elev.setPosition(-Elev.metersToRot(63), RequestType.kDown);
             outake.runWheelsOutake(-0.6);
-            outake.setPosition(1, OutakeRequestType.KDown);}, Elev).withTimeout(0.4)
+            outake.setPosition(outake.DegreesToRotations(2), OutakeRequestType.KDown);}, Elev).withTimeout(0.4)
             
             .andThen(Commands.run(()-> {
                 outake.runWheelsOutake(0);     
@@ -41,42 +41,10 @@ public class ElevatorCommands {
             }, outake, Elev));
                 
             }
-        
-
-    
-    public static Command scoreCoral(
-        ElevatorSub Elev, 
-        OutakeSub outake,
-        IndexerSub index,
-        double setpoint,
-        double targetOutake){
-
-        return Commands.run(()->{ 
-            Elev.setPosition(-Elev.metersToRot(63), RequestType.kDown);
-            outake.runWheelsOutake(-0.6);
-            outake.setPosition(1, OutakeRequestType.KDown);//--------------------------------
-
-        },Elev, outake, index).until(()-> !index.hasPiece() || Math.abs(outake.getCurrent()) < 25)
-
-        .andThen(
-            Commands.sequence(
-            Commands.run(()-> {
-                outake.stopwheelsOutake(); 
-                Elev.setPosition(-setpoint, RequestType.kUP);}, Elev, outake)).until(()-> Elev.atGoal()),
-            Commands.run(()-> {outake.setPosition(targetOutake, OutakeRequestType.kUp);} )
-        
-        .andThen(Commands.run(()-> {
-            outake.setPosition(targetOutake, OutakeRequestType.kUp);
-        }, Elev, outake, index)).
-        
-        finallyDo(()->{}));
-
-    }
 
     public static Command scoreCoral2(
         ElevatorSub Elev, 
         OutakeSub outake,
-        IndexerSub index,
         double setpoint,
         double targetOutake){
 
@@ -84,10 +52,12 @@ public class ElevatorCommands {
             Commands.run(()-> {
                 outake.stopwheelsOutake(); 
                 Elev.setPosition(-setpoint, RequestType.kUP);}, Elev, outake).until(()-> Elev.atGoal()),
+
             Commands.run(()-> {outake.setPosition(targetOutake, OutakeRequestType.kUp);} )
         ).
         
-        finallyDo(()->{ Elev.setPosition(-setpoint, RequestType.kUP);});
+        finallyDo(()->{ Elev.setPosition(-setpoint, RequestType.kUP);
+            outake.setPosition(targetOutake, OutakeRequestType.kUp);});
         
 
 
