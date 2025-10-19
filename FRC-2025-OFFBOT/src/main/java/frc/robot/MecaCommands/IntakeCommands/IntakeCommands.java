@@ -30,9 +30,9 @@ public class IntakeCommands {
         return Commands.run(()-> {intake.setPositionDown(angle);},intake).finallyDo(()->{intake.stopAll();});
     }
 
-    public static Command runIntakeManual(IntakeSub intake, DoubleSupplier joystick){
+    public static Command runIntakeManual(IntakeSub intake, double joystick){
         return Commands.run(()->{
-            intake.runIntake(joystick.getAsDouble());
+            intake.runIntake(joystick);
         }, intake).finallyDo(()->{intake.stopAng();});
     }
 

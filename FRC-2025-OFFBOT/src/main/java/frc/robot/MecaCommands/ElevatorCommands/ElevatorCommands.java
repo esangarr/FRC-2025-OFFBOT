@@ -84,7 +84,7 @@ public class ElevatorCommands {
                 Commands.run(()-> {outake.setPosition(targetOutake, typeOut);
                 }),
                 Commands.sequence(
-                    Commands.run(() -> outake.runWheelsOutake(speed), outake).withTimeout(0.1),
+                    Commands.run(() -> outake.runWheelsOutake(speed), outake).withTimeout(0.12),
                     Commands.run(() -> outake.stopwheelsOutake(), outake).withTimeout(0.1)).repeatedly()))
                     .finallyDo(()-> { outake.stopArm();});
 

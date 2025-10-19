@@ -113,8 +113,8 @@ import lib.ForgePlus.SwerveLib.Visualizers.SwerveWidget;
         }
 
         var ppController = new PPHolonomicDriveController(
-            new PIDConstants(2, 0,1.67),
-             new PIDConstants(0, 0.0, 0));
+            new PIDConstants(2, 0,0),
+             new PIDConstants(2, 0.0, 0));
 
         ppController.setEnabled(true);
    

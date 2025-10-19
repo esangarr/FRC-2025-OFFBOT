@@ -59,6 +59,8 @@ public class RobotContainer {
   private PathPlannerAuto mover;
   private PathPlannerAuto giro;
   private PathPlannerAuto L4;
+  private PathPlannerAuto L1;
+  private PathPlannerAuto L4Left;
 
 
   public SendableChooser<Command> chooser = new SendableChooser<>();
@@ -79,17 +81,23 @@ public class RobotContainer {
 
     NamedCommands.registerCommand("TakeCoral", ElevatorCommands.takeCoral(elevator, outake, elevator.metersToRot(85), outake.DegreesToRotations(2)).withTimeout(0.8));
     NamedCommands.registerCommand("UpL4", ElevatorCommands.scoreCoral2(elevator, outake, elevator.metersToRot(187), outake.DegreesToRotations(120)).withTimeout(2));
+    NamedCommands.registerCommand("UpL1", ElevatorCommands.scoreCoral2(elevator, outake, elevator.metersToRot(80), outake.DegreesToRotations(80)).withTimeout(1));
     NamedCommands.registerCommand("Retract", new ElevatorAuto(elevator, outake, elevator.metersToRot(80), outake.DegreesToRotations(2.5)));
-    NamedCommands.registerCommand("AutoDunk", OutakeCommands.shootDunk(outake, 0.4).withTimeout(0.05));
+    NamedCommands.registerCommand("AutoDunk", OutakeCommands.shootDunk(outake, 0.4).withTimeout(0.15));
+    NamedCommands.registerCommand("Shoot", OutakeCommands.moveWheels(outake, 0.6).withTimeout(0.5));
     NamedCommands.registerCommand("Home", ElevatorCommands.setPosDown(elevator, outake, elevator.metersToRot(80), outake.DegreesToRotations(2)).withTimeout(2));
 
 
     mover = new PathPlannerAuto("Auto1");
     giro = new PathPlannerAuto("AutoGiro");
     L4 = new PathPlannerAuto("ScoreL4");
+    L1 = new PathPlannerAuto("ScoreL1");
+    L4Left = new PathPlannerAuto("LeftScoreL4");
 
     chooser.addOption("AutoGiro", giro);
+    chooser.addOption("L1", L1);
     chooser.addOption("L4", L4);
+    chooser.addOption("L4Left", L4Left);
     chooser.setDefaultOption("Mover", mover);
 
     SmartDashboard.putData("AutoSelector", chooser);
@@ -121,18 +129,17 @@ public class RobotContainer {
     driver.povUp().whileTrue(DriveCommands.moveInY(chassis, 0.35));
     driver.povDown().whileTrue(DriveCommands.moveInY(chassis,-0.35));
 
-    driver.y().toggleOnTrue(IntakeCommands.setAngleUp(intake, 35)); // Cambiar a Driver
-    driver.a().whileTrue(IntakeCommands.setAngleDown(intake, 240)); // Cambiar a Driver
-
+    driver.y().toggleOnTrue(IntakeCommands.setAngleUp(intake, 35)); 
+    driver.a().whileTrue(IntakeCommands.runIntakeManual(intake, 6)); 
     //---------------------------------------------------------------- DRIVER ----------------------------------------------------------------
 
     //---------------------------------------------------------------- OPERATOR ----------------------------------------------------------------
-    outake.setDefaultCommand(OutakeCommands.armManual(outake, ()-> -operator.getRightY()*0.2));
-    elevator.setDefaultCommand(ElevatorCommands.runManual(elevator, ()-> operator.getLeftY()*0.2));
-    
+    outake.setDefaultCommand(OutakeCommands.armManual(outake, ()-> -operator.getRightY()*0.35));
+    elevator.setDefaultCommand(ElevatorCommands.runManual(elevator, ()-> operator.getLeftY()*0.45));
+
     
     operator.a().toggleOnTrue(ElevatorCommands.scoreCoral2(elevator, outake,  elevator.metersToRot(88), outake.DegreesToRotations(80)));
-    operator.x().toggleOnTrue(ElevatorCommands.scoreCoral2(elevator, outake,  elevator.metersToRot(72), outake.DegreesToRotations(125)));
+    operator.x().toggleOnTrue(ElevatorCommands.scoreCoral2(elevator, outake,  elevator.metersToRot(72), outake.DegreesToRotations(132)));
 
     operator.b().toggleOnTrue(ElevatorCommands.scoreCoral2(elevator, outake, elevator.metersToRot(117), outake.DegreesToRotations(128)));
     operator.y().toggleOnTrue(ElevatorCommands.scoreCoral2(elevator, outake, elevator.metersToRot(187), outake.DegreesToRotations(119)));
@@ -141,11 +148,11 @@ public class RobotContainer {
     operator.leftStick().whileTrue(ElevatorCommands.takeCoral(elevator, outake, elevator.metersToRot(85), outake.DegreesToRotations(2.5)));
 
 
-    operator.povLeft().toggleOnTrue(ElevatorCommands.GetAlgae(elevator, outake, elevator.metersToRot(93), outake.DegreesToRotations(90), -0.32, RequestType.kUP, OutakeRequestType.kUp));
-    operator.povRight().toggleOnTrue(ElevatorCommands.GetAlgae(elevator, outake, elevator.metersToRot(140), outake.DegreesToRotations(82), -0.32,RequestType.kUP, OutakeRequestType.kUp));
+    operator.povLeft().toggleOnTrue(ElevatorCommands.GetAlgae(elevator, outake, elevator.metersToRot(93), outake.DegreesToRotations(90), -0.33, RequestType.kUP, OutakeRequestType.kUp));
+    operator.povRight().toggleOnTrue(ElevatorCommands.GetAlgae(elevator, outake, elevator.metersToRot(140), outake.DegreesToRotations(82), -0.33,RequestType.kUP, OutakeRequestType.kUp));
 
-    operator.rightStick().toggleOnTrue(ElevatorCommands.GetAlgae(elevator, outake, elevator.metersToRot(80), outake.DegreesToRotations(135), -0.32,RequestType.kDown, OutakeRequestType.KAlgae));
-    operator.povUp().toggleOnTrue(ElevatorCommands.GetAlgae(elevator, outake, elevator.metersToRot(187), outake.DegreesToRotations(140), -0.32, RequestType.kUP, OutakeRequestType.KAlgae));
+    operator.rightStick().toggleOnTrue(ElevatorCommands.GetAlgae(elevator, outake, elevator.metersToRot(80), outake.DegreesToRotations(135), -0.33,RequestType.kDown, OutakeRequestType.KAlgae));
+    operator.povUp().toggleOnTrue(ElevatorCommands.GetAlgae(elevator, outake, elevator.metersToRot(187), outake.DegreesToRotations(165), -0.33, RequestType.kUP, OutakeRequestType.KAlgae));
 
 
     operator.leftBumper().whileTrue(IntakeCommands.outPiece(intake, index, 0.9, 35, 0.5 ));

@@ -118,7 +118,7 @@ public class OutakeSub extends NetworkSubsystem{
         slot2Configs.kS = 1; // Add 0.25 V output to overcome static friction
         slot2Configs.kV = 0; // A velocity target of 1 rps results in 0.12 V output
         slot2Configs.kA = 0; // An acceleration of 1 rps/s requires 0.01 V output
-        slot2Configs.kP = 1.8; // A position error of 2.5 rotations results in 12 V output
+        slot2Configs.kP = 1.3; // A position error of 2.5 rotations results in 12 V output
         slot2Configs.kI = 0; // no output for integrated error
         slot2Configs.kD = 0 ; // A velocity error of 1 rps results in 0.1 V output
     
@@ -137,7 +137,7 @@ public class OutakeSub extends NetworkSubsystem{
 
     public void setPosition(double position, OutakeRequestType type){
 
-        if (getPosition() < -2 || getSetpoint() < -2){
+        if (getPosition() < -5 || getSetpoint() < -5){
             arm.stopMotor();
         }else{
             if (type == OutakeRequestType.kUp){
@@ -158,6 +158,10 @@ public class OutakeSub extends NetworkSubsystem{
 
     public double getSetpoint(){
         return RotationsToDegrees(arm.getClosedLoopReference().getValueAsDouble());
+    }
+
+    public boolean fixOutake(){
+        return !(getPosition() < -2 || getSetpoint() < -2);
     }
 
 

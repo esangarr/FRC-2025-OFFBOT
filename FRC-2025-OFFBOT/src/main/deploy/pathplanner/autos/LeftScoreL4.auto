@@ -23,7 +23,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "GoL4"
+                  "pathName": "LeftGoL4"
                 }
               },
               {
@@ -62,7 +62,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "GetBackL4"
+            "pathName": "LeftBackL1"
           }
         },
         {

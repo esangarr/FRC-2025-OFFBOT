@@ -23,13 +23,13 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "GoL4"
+                  "pathName": "GoL1"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "UpL4"
+                  "name": "UpL1"
                 }
               }
             ]
@@ -44,25 +44,13 @@
         {
           "type": "named",
           "data": {
-            "name": "AutoDunk"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.05
-          }
-        },
-        {
-          "type": "named",
-          "data": {
             "name": "Shoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "GetBackL4"
+            "pathName": "LeftBackL1"
           }
         },
         {

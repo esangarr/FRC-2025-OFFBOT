@@ -236,13 +236,13 @@ public class SwerveModule{
         driveSparkMax.flashConfiguration(
             isDriveMotorInverted,
             IdleMode.kBrake,
-            60,
+            80,
             true);
         
         turnSparkMax.flashConfiguration(
             isTurnMotorInverted,
             IdleMode.kBrake,
-            30,
+            40,
             true);
 
     }
