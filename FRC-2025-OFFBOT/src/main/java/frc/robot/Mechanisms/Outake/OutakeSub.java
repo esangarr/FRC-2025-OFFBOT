@@ -152,12 +152,16 @@ public class OutakeSub extends NetworkSubsystem{
 
     }
 
+    private double roundNumber(double number){
+        return Math.round(number * 100) / 100;
+    }
+
     public void reset(){
         arm.setPosition(0);
     }
 
     public double getSetpoint(){
-        return RotationsToDegrees(arm.getClosedLoopReference().getValueAsDouble());
+        return roundNumber(RotationsToDegrees(arm.getClosedLoopReference().getValueAsDouble()));
     }
 
     public boolean fixOutake(){
@@ -166,7 +170,7 @@ public class OutakeSub extends NetworkSubsystem{
 
 
     public double getPosition(){ 
-        return (rotorPosRotations / 66.666) * 360;
+        return roundNumber((rotorPosRotations / 66.666) * 360);
     }
 
     public double RotationsToDegrees(double rotations){

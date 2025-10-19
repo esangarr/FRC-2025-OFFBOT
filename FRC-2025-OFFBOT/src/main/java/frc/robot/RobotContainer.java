@@ -156,9 +156,10 @@ public class RobotContainer {
 
 
     operator.leftBumper().whileTrue(IntakeCommands.outPiece(intake, index, 0.9, 35, 0.5 ));
-    operator.rightBumper().whileTrue(IntakeCommands.clearPiece(intake, index, elevator, outake, 0.9, 0.5, 0.5 , timerOut, 35, 200));
+    operator.rightBumper().whileTrue(IntakeCommands.clearPiece(intake, index, elevator, outake, 0.9, 0.5, 1 , timerOut, 35, 200));
 
     operator.start().whileTrue(OutakeCommands.resetArmEncoder(outake));
+    operator.button(7).whileTrue(ElevatorCommands.resetElevator(elevator));
 
     operator.leftTrigger().whileTrue(OutakeCommands.moveWheels(outake, 1));
     operator.rightTrigger().whileTrue(OutakeCommands.shootDunk(outake, 0.4)); 

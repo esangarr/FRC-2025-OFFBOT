@@ -72,8 +72,12 @@ public class IntakeSub extends NetworkSubsystem{
         SmartDashboard.putBoolean("Intake/Algoal", atGoal());
     }
 
+    private double roundNumber(double number){
+        return Math.round(number * 100) / 100;
+    }
+
     public double getPositionAng(){ 
-        return (encoder.getPosition()  * 360); 
+        return roundNumber((encoder.getPosition()  * 360)); 
 
     }
 
@@ -111,7 +115,7 @@ public class IntakeSub extends NetworkSubsystem{
 
     
     public double currentSetpoint(){
-        return pidUp.getSetpoint()*pidDown.getSetpoint() >= 0 ? pidUp.getSetpoint() : pidDown.getSetpoint();
+        return roundNumber(pidUp.getSetpoint()*pidDown.getSetpoint() >= 0 ? pidUp.getSetpoint() : pidDown.getSetpoint());
     }
 
     public boolean atGoal(){

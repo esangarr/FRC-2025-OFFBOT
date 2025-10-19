@@ -20,6 +20,12 @@ public class ElevatorCommands {
 
     }
 
+    public static Command resetElevator(ElevatorSub Elev){
+
+        return Commands.run(()->{ Elev.resetElev();},Elev);
+
+    }
+
     public static Command setVol(ElevatorSub Elev, double voltage){
         return Commands.run(()->{ Elev.setVoltage(voltage);}, Elev).finallyDo(()->{Elev.StopMotors();});
     }

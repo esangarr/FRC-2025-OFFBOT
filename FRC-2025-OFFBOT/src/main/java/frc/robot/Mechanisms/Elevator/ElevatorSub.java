@@ -140,9 +140,16 @@ public class ElevatorSub extends NetworkSubsystem{
 
     }
 
+    private double roundNumber(double number){
+        return Math.round(number * 100) / 100;
+    }
+
+    public void resetElev(){
+        leader.setPosition(63.5);
+    }
 
     public double getSetpoint(){
-        return RotationsToMeters(leader.getClosedLoopReference().getValueAsDouble());
+        return roundNumber(RotationsToMeters(leader.getClosedLoopReference().getValueAsDouble()));
     }
 
     public boolean atGoal(){
