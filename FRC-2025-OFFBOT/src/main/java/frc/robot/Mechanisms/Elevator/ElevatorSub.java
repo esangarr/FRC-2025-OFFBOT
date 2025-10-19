@@ -145,7 +145,7 @@ public class ElevatorSub extends NetworkSubsystem{
     }
 
     public void resetElev(){
-        leader.setPosition(63.5);
+        leader.setPosition(0);
     }
 
     public double getSetpoint(){
