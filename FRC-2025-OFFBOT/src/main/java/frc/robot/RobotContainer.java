@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.AutoCommands.AutoTakeCoral;
 import frc.robot.AutoCommands.ElevatorAuto;
 import frc.robot.DriveCommands.DriveCommands;
 import frc.robot.DriveTrain.Swerve;
@@ -34,8 +33,6 @@ import frc.robot.Mechanisms.Indexer.IndexerSub;
 import frc.robot.Mechanisms.Intake.IntakeSub;
 import frc.robot.Mechanisms.Outake.OutakeSub;
 import frc.robot.Mechanisms.Outake.OutakeSub.OutakeRequestType;
-import lib.ForgePlus.NetworkTableUtils.NTPublisher;
-import lib.ForgePlus.NetworkTableUtils.NTSendableChooser;
 import lib.ForgePlus.SwerveLib.Utils.Smoothjoystick;
 
 public class RobotContainer {

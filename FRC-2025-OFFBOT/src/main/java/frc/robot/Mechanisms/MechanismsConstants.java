@@ -1,7 +1,6 @@
 package frc.robot.Mechanisms;
 
 import lib.ForgePlus.Math.Profiles.ProfileGains.CompleteFeedForwardGains;
-import lib.ForgePlus.Math.Profiles.ProfileGains.PIDFGains;
 import lib.ForgePlus.Math.Profiles.ProfileGains.PIDGains;
 
 public class MechanismsConstants {

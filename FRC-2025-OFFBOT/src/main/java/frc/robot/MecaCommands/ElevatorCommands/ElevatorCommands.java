@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Mechanisms.Elevator.ElevatorSub;
 import frc.robot.Mechanisms.Elevator.ElevatorSub.RequestType;
-import frc.robot.Mechanisms.Indexer.IndexerSub;
 import frc.robot.Mechanisms.Outake.OutakeSub;
 import frc.robot.Mechanisms.Outake.OutakeSub.OutakeRequestType;
 

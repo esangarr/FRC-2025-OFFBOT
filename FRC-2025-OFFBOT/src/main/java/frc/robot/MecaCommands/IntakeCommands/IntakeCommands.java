@@ -1,12 +1,9 @@
 package frc.robot.MecaCommands.IntakeCommands;
 
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Mechanisms.Elevator.ElevatorSub;
-import frc.robot.Mechanisms.Elevator.ElevatorSub.RequestType;
 import frc.robot.Mechanisms.Indexer.IndexerSub;
 import frc.robot.Mechanisms.Intake.IntakeSub;
 import frc.robot.Mechanisms.Outake.OutakeSub;
